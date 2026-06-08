@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicaciones WEB para Entrenadores y Clubes | Luichi Peláez</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Urbanist:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #060b13;
+            --bg-card: #0f172a;
+            --primary-neon: #00f2aa;
+            --primary-hover: #05d093;
+            --accent-blue: #38bdf8;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --gradient-accent: linear-gradient(135deg, #00f2aa 0%, #38bdf8 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            font-family: 'Urbanist', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* BARRA DE NAVEGACIÓN (STICKY) */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(6, 11, 19, 0.85);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--primary-neon);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--primary-neon);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            padding: 160px 20px 100px 20px;
+            text-align: center;
+            position: relative;
+            background: radial-gradient(circle at top, rgba(0, 242, 170, 0.15) 0%, transparent 60%);
+        }
+
+        .badges-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .badge {
+            background: rgba(0, 242, 170, 0.1);
+            border: 1px solid var(--primary-neon);
+            color: var(--primary-neon);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge.blue {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .hero h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 span {
+            background: var(--gradient-accent);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+        }
+
+        /* FILOSOFÍA CALLOUT */
+        .philosophy-banner {
+            max-width: 1000px;
+            margin: 0 auto 80px auto;
+            background: linear-gradient(90deg, rgba(15, 23, 42, 0.6) 0%, rgba(6, 11, 19, 0.9) 100%);
+            border-left: 4px solid var(--primary-neon);
+            padding: 30px;
+            border-radius: 0 16px 16px 0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .philosophy-banner h3 {
+            color: var(--primary-neon);
+            margin-bottom: 8px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .philosophy-banner p {
+            font-size: 17px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        /* SECCIONES DE APLICACIONES */
+        .section-title {
+            text-align: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 38px;
+            margin-bottom: 60px;
+        }
+
+        .section-title span {
+            color: var(--primary-neon);
+        }
+
+        .apps-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .app-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 100px;
+            align-items: center;
+        }
+
+        .app-item:nth-child(even) {
+            direction: rtl;
+        }
+
+        .app-item:nth-child(even) .app-content {
+            direction: ltr;
+        }
+
+        .app-image-container {
+            position: relative;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4);
+            transition: transform 0.3s;
+        }
+
+        .app-image-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .app-image-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            display: block;
+        }
+
+        .download-overlay {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-content h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 30px;
+            margin-bottom: 20px;
+            color: var(--text-light);
+        }
+
+        .app-content p {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-bottom: 25px;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 35px;
+        }
+
+        .features-list li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .features-list li i {
+            position: absolute;
+            left: 0;
+            top: 4px;
+            color: var(--primary-neon);
+        }
+
+        /* BOTONES */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            font-size: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-neon);
+            color: var(--bg-dark);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            box-shadow: 0 10px 20px rgba(0, 242, 170, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            background-color: rgba(239, 68, 68, 0.2);
+        }
+
+        /* SECCIÓN PRECIOS */
+        .precios-section {
+            background: rgba(15, 23, 42, 0.4);
+            padding: 100px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .pricing-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            align-items: start;
+        }
+
+        .pricing-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 40px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            transition: transform 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .pricing-card.featured {
+            border: 2px solid var(--primary-neon);
+            box-shadow: 0 20px 40px rgba(0, 242, 170, 0.05);
+            grid-column: span 1;
+        }
+
+        .pricing-card.full-width {
+            grid-column: span 3;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            align-items: center;
+            background: linear-gradient(135deg, #0f172a 0%, #060b13 100%);
+        }
+
+        .card-badge {
+            position: absolute;
+            top: -15px;
+            right: 30px;
+            background: var(--primary-neon);
+            color: var(--bg-dark);
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .pricing-card h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--text-light);
+            font-family: 'Space Grotesk', sans-serif;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: baseline;
+            gap: 5px;
+        }
+
+        .price span {
+            font-size: 16px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* SECCIÓN CURRÍCULUM DEPORTIVO (NUEVA) */
+        .cv-section {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .cv-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 50px;
+        }
+
+        .cv-profile {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 40px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            height: fit-content;
+        }
+
+        .cv-avatar {
+            width: 130px;
+            height: 130px;
+            background: var(--gradient-accent);
+            border-radius: 50%;
+            margin: 0 auto 25px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--bg-dark);
+        }
+
+        .cv-profile h3 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+
+        .cv-profile .title-sub {
+            color: var(--primary-neon);
+            font-weight: 700;
+            font-size: 15px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .cv-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .timeline-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2px;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--primary-neon);
+            border-radius: 4px;
+        }
+
+        .timeline-date {
+            color: var(--accent-blue);
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .timeline-item h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        /* CONTACTO */
+        .contacto-section {
+            padding: 80px 20px;
+            text-align: center;
+            background: radial-gradient(circle at bottom, rgba(56, 189, 248, 0.1) 0%, transparent 60%);
+        }
+
+        .contact-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .contact-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px 30px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .contact-card:hover {
+            border-color: var(--primary-neon);
+            transform: translateY(-3px);
+        }
+
+        .contact-card i {
+            font-size: 24px;
+            color: var(--primary-neon);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 968px) {
+            .app-item, .cv-grid, .pricing-card.full-width {
+                grid-template-columns: 1fr;
+            }
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            .pricing-card.full-width {
+                grid-column: span 1;
+            }
+            .hero h1 { font-size: 40px; }
+            nav ul { display: none; } /* Simplificado para móviles */
+            .app-item:nth-child(even) { direction: ltr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo">Luichi Peláez<span> Desarrollo de software deportivo</span></div>
+            <nav>
+                <ul>
+                    <li><a href="#inicio">Inicio</a></li>
+                    <li><a href="#aplicaciones">Aplicaciones</a></li>
+                    <li><a href="#precios">Precios</a></li>
+                    <li><a href="#trayectoria">Trayectoria CV</a></li>
+                    <li><a href="#contacto">Contacto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="inicio">
+        <div class="badges-container">
+            <span class="badge"><i class="fa-solid fa-ranking-star"></i> Entrenador UEFA PRO</span>
+            <span class="badge blue"><i class="fa-solid fa-code"></i> Ingeniero Informático</span>
+        </div>
+        <h1>Aplicaciones Web de Élite para<br><span>Entrenadores y Clubes</span></h1>
+        <p>Optimiza la gestión táctica, planificación y scouting de tu equipo. El objetivo principal no es lucrarse, sino dotar a los cuerpos técnicos de herramientas profesionales que ahorren tiempo crítico de oficina para dedicarlo al césped.</p>
+        
+        <div class="philosophy-banner">
+            <h3>Filosofía del Ecosistema</h3>
+            <p>"Menos tiempo planificando y registrando datos en hojas complejas, más tiempo focalizado en la dirección de campo y gestión de vestuario. Gestión profesional al alcance de todos."</p>
+        </div>
+        
+        <div class="btn-group" style="justify-content: center;">
+            <a href="#aplicaciones" class="btn btn-primary">Explorar Aplicaciones</a>
+            <a href="#precios" class="btn btn-secondary">Ver Ofertas Absolutas</a>
+        </div>
+    </section>
+
+    <section class="apps-container" id="aplicaciones">
+        <h2 class="section-title">Ecosistema de <span>Software Comercial</span></h2>
+
+        <div class="app-item">
+            <div class="app-image-container">
+                <img src="pizarra_tactica_infografia.png" alt="Luichi Peláez Board">
+                <div class="download-overlay">
+                    <a href="pizarra_tactica_infografia.png" download class="btn btn-secondary"><i class="fa-solid fa-circle-arrow-down"></i> Descargar Infografía Completa</a>
+                </div>
+            </div>
+            <div class="app-content">
+                <div class="badge">Estrategia</div>
+                <h3 style="margin-top: 10px;">1. Luichi Peláez Board</h3>
+                <p>La Pizarra Táctica Definitiva diseñada para crear, estructurar y animar tus sesiones estratégicas de forma sumamente ágil.</p>
+                <ul class="features-list">
+                    <li><i class="fa-solid fa-check"></i> Control total antiborrado con marcas de agua personalizadas.</li>
+                    <li><i class="fa-solid fa-check"></i> Campos configurables (Fútbol 11, Fútbol Sala, Baloncesto, etc.).</li>
+                    <li><i class="fa-solid fa-check"></i> Animación intuitiva por fotogramas y exportación directa a video .webm.</li>
+                    <li><i class="fa-solid fa-check"></i> "Modo Vestuario" a pantalla completa para charlas tácticas dinámicas.</li>
+                </ul>
+                <div class="btn-group">
+                    <a href="https://luichipelaez.com/demo-board" target="_blank" class="btn btn-primary"><i class="fa-solid fa-globe"></i> Probar Demo</a>
+                    <a href="https://www.youtube.com" target="_blank" class="btn btn-danger"><i class="fa-brands fa-youtube"></i> Ver Video Tutorial</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-item">
+            <div class="app-image-container">
+                <img src="scouting_infografia.png" alt="App Scouting & Cartera">
+                <div class="download-overlay">
+                    <a href="scouting_infografia.png" download class="btn btn-secondary"><i class="fa-solid fa-circle-arrow-down"></i> Descargar Infografía Completa</a>
+                </div>
+            </div>
+            <div class="app-content">
+                <div class="badge">Talento</div>
+                <h3 style="margin-top: 10px;">2. Scouting & Cartera de Jugadores</h3>
+                <p>Centraliza y digitaliza el análisis exhaustivo de futbolistas y rivales con sincronización directa en la nube.</p>
+                <ul class="features-list">
+                    <li><i class="fa-solid fa-check"></i> Sincronización transparente e instantánea con Google Sheets.</li>
+                    <li><i class="fa-solid fa-check"></i> Módulos separados: Cartera de Ojeo, Seguimiento y Gestión de Actas.</li>
+                    <li><i class="fa-solid fa-check"></i> Sistema potente de filtrado avanzado por posiciones y variables.</li>
+                    <li><i class="fa-solid fa-check"></i> Fichas visuales atractivas ideales para secretarías técnicas.</li>
+                </ul>
+                <div class="btn-group">
+                    <a href="https://luichipelaez.com/demo-scouting" target="_blank" class="btn btn-primary"><i class="fa-solid fa-globe"></i> Probar Demo</a>
+                    <a href="https://www.youtube.com" target="_blank" class="btn btn-danger"><i class="fa-brands fa-youtube"></i> Ver Video Tutorial</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-item">
+            <div class="app-image-container">
+                <img src="control_temporada_infografia.png" alt="Control de Temporada">
+                <div class="download-overlay">
+                    <a href="control_temporada_infografia.png" download class="btn btn-secondary"><i class="fa-solid fa-circle-arrow-down"></i> Descargar Infografía Completa</a>
+                </div>
+            </div>
+            <div class="app-content">
+                <div class="badge">Gestión Integral</div>
+                <h3 style="margin-top: 10px;">3. Control de Temporada</h3>
+                <p>Panel de control absoluto en interfaz oscura para eliminar por completo el uso de papeles en tu cuerpo técnico.</p>
+                <ul class="features-list">
+                    <li><i class="fa-solid fa-check"></i> Gestión de asistencias diaria parametrizada por tipo de ausencia.</li>
+                    <li><i class="fa-solid fa-check"></i> Control de convocatorias, actas, minutajes y calificaciones (1-10).</li>
+                    <li><i class="fa-solid fa-check"></i> Biblioteca metodológica integrada para ejercicios y tareas.</li>
+                    <li><i class="fa-solid fa-check"></i> Exportación limpia y directa "Ready for WhatsApp" en formato PDF.</li>
+                </ul>
+                <div class="btn-group">
+                    <a href="https://luichipelaez.com/demo-gestion" target="_blank" class="btn btn-primary"><i class="fa-solid fa-globe"></i> Probar Demo</a>
+                    <a href="https://www.youtube.com" target="_blank" class="btn btn-danger"><i class="fa-brands fa-youtube"></i> Ver Video Tutorial</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-item">
+            <div class="app-image-container">
+                <img src="planificador_partidos_infografia.png" alt="Planificador de Partidos">
+                <div class="download-overlay">
+                    <a href="planificador_partidos_infografia.png" download class="btn btn-secondary"><i class="fa-solid fa-circle-arrow-down"></i> Descargar Infografía Completa</a>
+                </div>
+            </div>
+            <div class="app-content">
+                <div class="badge">Match Day</div>
+                <h3 style="margin-top: 10px;">4. Planificador de Partidos Élite</h3>
+                <p>Diseña alineaciones y hojas de partido completas estructurando todas las fases de juego mediante interacciones fluidas.</p>
+                <ul class="features-list">
+                    <li><i class="fa-solid fa-check"></i> Sistema interactivo Drag & Drop para mover jugadores por el campo.</li>
+                    <li><i class="fa-solid fa-check"></i> Gestión clara de banquillo, lesionados, sancionados y descartes.</li>
+                    <li><i class="fa-solid fa-check"></i> Bloques de texto analíticos integrados para las 5 fases estratégicas del juego.</li>
+                    <li><i class="fa-solid fa-check"></i> Descargas rápidas en formatos limpios (.jpg, .pdf estructurado o archivo de datos .json).</li>
+                </ul>
+                <div class="btn-group">
+                    <a href="https://luichipelaez.com/demo-planificador" target="_blank" class="btn btn-primary"><i class="fa-solid fa-globe"></i> Probar Demo</a>
+                    <a href="https://www.youtube.com" target="_blank" class="btn btn-danger"><i class="fa-brands fa-youtube"></i> Ver Video Tutorial</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="precios-section" id="precios">
+        <h2 class="section-title">Inversión y <span>Tarifas Sociales</span></h2>
+        
+        <div class="pricing-grid">
+            <div class="pricing-card featured full-width">
+                <span class="card-badge">Mejor Opción</span>
+                <div>
+                    <h4>PACK COMPLETO (Ecosistema Total)</h4>
+                    <p style="color: var(--text-muted); margin-bottom: 0;">Obtén las 4 herramientas web con acceso ilimitado para ti y tu club. Sincronización cruzada, actualizaciones y soporte técnico directo.</p>
+                </div>
+                <div style="text-align: right;">
+                    <div class="price" style="justify-content: flex-end;">45 €<span>/ Pago único</span></div>
+                    <a href="#contacto" class="btn btn-primary" style="width: 100%; justify-content: center;">Adquirir Todo</a>
+                </div>
+            </div>
+
+            <div class="pricing-card">
+                <h4>Pack Pizarras</h4>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Incluye la Pizarra Táctica Animada y el Planificador de Partidos Avanzado.</p>
+                <div class="price">15 €<span>/ Pago único</span></div>
+                <a href="#contacto" class="btn btn-secondary" style="width: 100%; justify-content: center;">Solicitar Pack</a>
+            </div>
+
+            <div class="pricing-card">
+                <h4>Control de Temporada</h4>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">La suite completa de gestión analítica de entrenamientos, actas y asistencias.</p>
+                <div class="price">30 €<span><i class="fa-solid fa-equals"></i> 2.50€ al mes</span></div>
+                <a href="#contacto" class="btn btn-secondary" style="width: 100%; justify-content: center;">Comprar Individual</a>
+            </div>
+
+            <div class="pricing-card">
+                <h4>Aplicación Individual</h4>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Elige de manera suelta: Pizarra Táctica, Planificador de Partidos o Scouting.</p>
+                <div class="price">12 €<span>c/u <i class="fa-solid fa-equals"></i> 1€ al mes</span></div>
+                <a href="#contacto" class="btn btn-secondary" style="width: 100%; justify-content: center;">Elegir Módulo</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="cv-section" id="trayectoria">
+        <h2 class="section-title">Trayectoria <span>Técnico-Deportiva</span></h2>
+        
+        <div class="cv-grid">
+            <div class="cv-profile">
+                <div class="cv-avatar">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+                <h3>Luichi Peláez</h3>
+                <div class="title-sub">UEFA PRO Coach & Software Engineer</div>
+                <p style="font-size: 15px; color: var(--text-muted); text-align: justify; margin-bottom: 20px;">
+                    Apasionado del fútbol y la arquitectura de software. Mi valor diferencial radica en la capacidad de trasladar las necesidades tácticas del campo de juego real al desarrollo ágil de sistemas informáticos eficientes en la nube.
+                </p>
+                <div style="text-align: left; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                    <p style="font-size: 14px; margin-bottom: 5px;"><strong style="color: var(--primary-neon);">Ubicación:</strong> España</p>
+                    <p style="font-size: 14px; margin-bottom: 5px;"><strong style="color: var(--primary-neon);">Especialidad:</strong> Metodología de entrenamiento, Big Data aplicado y Análisis Táctico.</p>
+                </div>
+            </div>
+
+            <div class="cv-timeline">
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">Licencia Máxima Federativa</div>
+                    <h4>Entrenador de Fútbol UEFA PRO</h4>
+                    <p style="color: var(--text-muted); font-size: 15px;">Capacitado para la dirección de equipos profesionales a nivel internacional. Especialista en gestión estratégica, diseño de tareas contextualizadas y dirección de partidos de alto rendimiento.</p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Formación Científica</div>
+                    <h4>Ingeniero en Informática de Sistemas</h4>
+                    <p style="color: var(--text-muted); font-size: 15px;">Desarrollador full-stack orientado a la creación de aplicaciones web escalables de alta velocidad. Experto en optimización de flujos de bases de datos relacionales y entornos UI/UX limpios.</p>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Experiencia en los Banquillos / Gestión</div>
+                    <h4>Trayectoria en Clubes y Proyectos</h4>
+                    <p style="color: var(--text-muted); font-size: 15px; margin-bottom: 10px;">Aplicación práctica de sistemas tecnológicos en cuerpos técnicos competitivos:</p>
+                    <ul style="padding-left: 20px; font-size: 14px; color: var(--text-muted);">
+                        <li style="margin-bottom: 5px;">[Rellenar aquí: Club / Categoría / Temporada - Logros tácticos u objetivos cumplidos]</li>
+                        <li style="margin-bottom: 5px;">[Rellenar aquí: Club / Gestión Metodológica - Implementación de software propio]</li>
+                        <li style="margin-bottom: 5px;">Dirección y liderazgo de plantillas enfocando el modelo de juego en datos de rendimiento atómicos.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="contacto-section" id="contacto">
+        <div class="contact-wrapper">
+            <h2 class="section-title" style="margin-bottom: 20px;">¿Hablamos de <span>Fútbol o Código?</span></h2>
+            <p style="color: var(--text-muted); font-size: 18px;">Ponte en contacto conmigo si quieres adquirir el pack de herramientas, resolver dudas metodológicas, sugerir mejoras o agendar una asesoría para tu club.</p>
+            
+            <div class="contact-links">
+                <a href="mailto:luichipelaez@gmail.com" class="contact-card">
+                    <i class="fa-solid fa-envelope"></i>
+                    <div>
+                        <div style="font-size: 12px; color: var(--text-muted); text-align: left;">Email Directo</div>
+                        <div>luichipelaez@gmail.com</div>
+                    </div>
+                </a>
+                
+                <a href="https://x.com/Luichipelaez" target="_blank" class="contact-card">
+                    <i class="fa-brands fa-x-twitter"></i>
+                    <div>
+                        <div style="font-size: 12px; color: var(--text-muted); text-align: left;">Perfil de X</div>
+                        <div>@Luichipelaez</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Luichi Peláez. Desarrollado con pasión táctica e ingeniería avanzada. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>
