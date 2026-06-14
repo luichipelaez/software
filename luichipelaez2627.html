@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUICHI PELAEZ - Coach Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --card-hover: #21262d;
+            --accent-color: #00ff87; /* Verde fútbol premium */
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        /* Fondo decorativo sutil (efecto campo de fútbol abstracto) */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,255,135,0.05) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .subtitle {
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 6px;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #ffffff 30%, #a3a3a3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        h1 span {
+            display: block;
+            background: linear-gradient(135deg, var(--accent-color) 0%, #00bcff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Contenedor de la cuadrícula de botones */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(300px, 420px));
+            gap: 2rem;
+            width: 100%;
+            max-width: 900px;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        /* Estilo espectacular de los grandes botones */
+        .app-card {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            text-decoration: none;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Efecto de brillo al pasar el ratón */
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 135, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .app-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .app-card:hover {
+            transform: translateY(-10px);
+            background-color: var(--card-hover);
+            border-color: var(--accent-color);
+            box-shadow: 0 15px 35px rgba(0, 255, 135, 0.15);
+        }
+
+        .app-card i {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .app-card:hover i {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .app-card h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .app-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* Responsivo para móviles */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            .grid-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            body {
+                padding: 1rem;
+            }
+        }
+
+        /* Animaciones */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <p class="subtitle">Cuadro de Mando</p>
+        <h1>LUICHI <span>PELÁEZ</span></h1>
+    </header>
+
+    <div class="grid-container">
+        
+        <a href="https://script.google.com/macros/s/AKfycbyqm8AOHHvX6-p8UI05EUjp-y3rGAsk8okxWDJjckGBspfUseyvTefbEXTkKu3Et5ObPQ/exec" target="_blank" class="app-card">
+            <i class="fa-solid fa-chart-line"></i>
+            <h2>Control de Temporada</h2>
+            <p>Gestión de plantilla, rendimiento y estadísticas 2026/2027</p>
+        </a>
+
+        <a href="https://script.google.com/macros/s/AKfycbwyVfwqZgLJDerPU6WY70gnH89-ydFeGOOSCBiFpTQEn4FQB9wOdR6qPH16xZGWBmFb/exec" target="_blank" class="app-card">
+            <i class="fa-solid fa-users-viewfinder"></i>
+            <h2>Scouting y Cartera</h2>
+            <p>Análisis de rivales y seguimiento de jugadores</p>
+        </a>
+
+        <a href="https://script.google.com/macros/s/AKfycbzJD67HtzOt4cU0VWfEVicht_ZWWkWhJ709WupcLJ8q7eaEJ7bBpZJwvUIq2LNMyHN8/exec" target="_blank" class="app-card">
+            <i class="fa-solid fa-chalkboard-user"></i>
+            <h2>Pizarra Táctica</h2>
+            <p>Diseño de estrategias, balón parado y sistemas</p>
+        </a>
+
+        <a href="https://script.google.com/macros/s/AKfycbzz8qJAeYKXMja3eu9rZY0HEc7mjQ5OaW3_LDLJCviNYWIPNbECd3OUWbV-hr72lNanrQ/exec" target="_blank" class="app-card">
+            <i class="fa-solid fa-calendar-check"></i>
+            <h2>Planificador de Partidos</h2>
+            <p>Convocatorias, timing y preparación de jornada</p>
+        </a>
+
+    </div>
+
+</body>
+</html>
