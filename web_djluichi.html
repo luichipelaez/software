@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJ LUICHI | Sitio Oficial</title>
+    <style>
+        /* --- RESET Y VARIABLES --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Tema por defecto (Oscuro) */
+        :root {
+            --bg-color: #0d0d0d;
+            --mixer-bg: #1c1c1e;
+            --channel-bg: #2a2a2d;
+            --text-main: #f0f0f0;
+            
+            /* Colores de los Pads (Se mantienen fijos para identificar las sesiones) */
+            --c-90s: #ff0055;
+            --c-2000s: #9d00ff; 
+            --c-mashup: #00eeff;
+            --c-anual: #ffcc00;
+            --c-resto: #00ff55;
+            --c-video: #ff0000; /* Nuevo color para videos */
+        }
+
+        /* TEMA: Claro */
+        [data-theme="claro"] {
+            --bg-color: #e0e0e0;
+            --mixer-bg: #d1d1d1;
+            --channel-bg: #c0c0c0;
+            --text-main: #111111;
+        }
+
+        /* TEMA: Rojo */
+        [data-theme="rojo"] {
+            --bg-color: #2a0000;
+            --mixer-bg: #3d0000;
+            --channel-bg: #520000;
+            --text-main: #ffcccc;
+        }
+
+        /* TEMA: Azul */
+        [data-theme="azul"] {
+            --bg-color: #000a2a;
+            --mixer-bg: #001642;
+            --channel-bg: #002466;
+            --text-main: #cce0ff;
+        }
+
+        /* TEMA: Amarillo */
+        [data-theme="amarillo"] {
+            --bg-color: #2a2a00;
+            --mixer-bg: #3d3d00;
+            --channel-bg: #525200;
+            --text-main: #ffffcc;
+        }
+
+        /* TEMA: Naranja */
+        [data-theme="naranja"] {
+            --bg-color: #2a1100;
+            --mixer-bg: #3d1a00;
+            --channel-bg: #522400;
+            --text-main: #ffdfcc;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding-bottom: 100px; 
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        /* --- SELECTOR DE TEMAS --- */
+        .theme-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(0,0,0,0.5);
+            border-bottom: 1px solid #333;
+        }
+
+        .theme-btn {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
+        .theme-btn:hover { transform: scale(1.2); }
+        .t-oscuro { background: #0d0d0d; }
+        .t-claro { background: #e0e0e0; }
+        .t-rojo { background: #520000; }
+        .t-azul { background: #002466; }
+        .t-amarillo { background: #525200; }
+        .t-naranja { background: #522400; }
+
+        /* --- CABECERA Y ABOUT --- */
+        header {
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+
+        .about-section {
+            max-width: 800px;
+            margin: 0 auto 40px auto;
+            text-align: center;
+            line-height: 1.6;
+            padding: 0 20px;
+            opacity: 0.8;
+        }
+
+        /* --- LA MESA DE MEZCLAS --- */
+        .mixer-desk {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            background: var(--mixer-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: inset 0 0 30px #000, 0 15px 40px rgba(0,0,0,0.9);
+            max-width: 1400px; /* Ampliado para los nuevos canales */
+            margin: 0 auto;
+            border-bottom: 5px solid #000;
+            transition: background-color 0.5s ease;
+        }
+
+        .channel {
+            background: var(--channel-bg);
+            width: 220px;
+            padding: 20px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: background-color 0.5s ease;
+        }
+
+        .channel-wide {
+            width: 450px; 
+        }
+
+        .channel-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-align: center;
+            height: 40px; 
+            opacity: 0.7;
+        }
+
+        /* Elementos decorativos (Knobs y Faders) */
+        .knob-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .knob {
+            width: 20px;
+            height: 20px;
+            background: #111;
+            border-radius: 50%;
+            border: 2px solid #555;
+            position: relative;
+        }
+        .knob::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 8px;
+            width: 2px;
+            height: 6px;
+            background: #fff;
+        }
+
+        .fader-track {
+            width: 30px;
+            height: 100px;
+            background: #000;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; 
+            padding-bottom: 10px;
+        }
+
+        .fader-cap {
+            width: 40px;
+            height: 20px;
+            background: #333;
+            border: 1px solid #666;
+            border-radius: 2px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.8);
+        }
+
+        /* Botones de Sesiones (Pads) */
+        .pad-btn {
+            width: 100%;
+            padding: 15px 10px;
+            margin-bottom: 10px;
+            background: #222;
+            color: #ddd;
+            border: 1px solid #444;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .pad-btn:active {
+            transform: scale(0.95);
+        }
+
+        .pad-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+        .pad-grid .pad-btn {
+            margin-bottom: 0; 
+        }
+
+        /* Colores por canal */
+        .btn-90s:hover { background: rgba(255,0,85,0.2); box-shadow: 0 0 15px var(--c-90s); border-color: var(--c-90s); color: #fff; }
+        .btn-2000s:hover { background: rgba(157,0,255,0.2); box-shadow: 0 0 15px var(--c-2000s); border-color: var(--c-2000s); color: #fff; }
+        .btn-mashup:hover { background: rgba(0,238,255,0.2); box-shadow: 0 0 15px var(--c-mashup); border-color: var(--c-mashup); color: #fff; }
+        .btn-anual:hover { background: rgba(255,204,0,0.2); box-shadow: 0 0 15px var(--c-anual); border-color: var(--c-anual); color: #fff; }
+        .btn-resto:hover { background: rgba(0,255,85,0.2); box-shadow: 0 0 15px var(--c-resto); border-color: var(--c-resto); color: #fff; }
+        .btn-video:hover { background: rgba(255,0,0,0.2); box-shadow: 0 0 15px var(--c-video); border-color: var(--c-video); color: #fff; }
+
+        /* --- REPRODUCTOR FIJO --- */
+        .player-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #111;
+            border-top: 2px solid #333;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            min-height: 80px; 
+        }
+
+        .player-screen {
+            background: #000;
+            border: 1px solid #333;
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: #0f0; 
+            font-family: monospace;
+            font-size: 1.2rem;
+            min-width: 300px;
+            text-align: center;
+            box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.2);
+        }
+
+        /* --- MODAL PARA VIDEOS DE YOUTUBE --- */
+        .video-modal {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .video-container {
+            width: 80%;
+            max-width: 900px;
+            aspect-ratio: 16/9;
+            background: #000;
+            border: 2px solid var(--c-video);
+            box-shadow: 0 0 30px var(--c-video);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .close-video-btn {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background: var(--c-video);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        @media (max-width: 900px) {
+            .channel, .channel-wide { width: 100%; }
+            .mixer-desk { flex-direction: column; }
+            .video-container { width: 95%; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SELECTOR DE TEMAS -->
+    <div class="theme-selector">
+        <div class="theme-btn t-oscuro" onclick="cambiarTema('oscuro')" title="Tema Oscuro"></div>
+        <div class="theme-btn t-claro" onclick="cambiarTema('claro')" title="Tema Claro"></div>
+        <div class="theme-btn t-rojo" onclick="cambiarTema('rojo')" title="Tema Rojo"></div>
+        <div class="theme-btn t-azul" onclick="cambiarTema('azul')" title="Tema Azul"></div>
+        <div class="theme-btn t-amarillo" onclick="cambiarTema('amarillo')" title="Tema Amarillo"></div>
+        <div class="theme-btn t-naranja" onclick="cambiarTema('naranja')" title="Tema Naranja"></div>
+    </div>
+
+    <header>
+        <h1>DJ LUICHI</h1>
+        <div class="about-section">
+            <p>Bienvenido a la zona de mezclas. Después de más de media vida creando sesiones para fiestas propias y amigos, DJ LUICHI recopila muchas de ellas en este sitio oficial para hacerte vibrar de la mejor música de todas las épocas. Explora los canales de la mesa y dale al play para escuchar las sesiones que han marcado todas estas épocas en las pistas de baile.</p>
+        </div>
+    </header>
+
+    <!-- MESA DE MEZCLAS -->
+    <div class="mixer-desk">
+
+        <!-- CANAL 1: Noventeras -->
+        <div class="channel">
+            <div class="channel-title">Sesiones<br>Noventeras</div>
+            <div class="knob-container">
+                <div class="knob" style="transform: rotate(-40deg);"></div>
+                <div class="knob" style="transform: rotate(20deg);"></div>
+            </div>
+            <div class="fader-track"><div class="fader-cap" style="transform: translateY(-20px);"></div></div>
+
+            <button class="pad-btn btn-90s" data-track="Short Mix 90s" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/short-mix-90s/">Short Mix 90s</button>
+            <button class="pad-btn btn-90s" data-track="Sesion los 90 total estilos" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/sesion-los-90-total-estilos/">Sesion los 90 estilos</button>
+            <button class="pad-btn btn-90s" data-track="Sesion 90s remixes" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/sesion-90s-remixes/">Sesion 90s remixes</button>
+            <button class="pad-btn btn-90s" data-track="Sesion 90s 2019" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/sesion-90s-2019/">Sesion 90s 2019</button>
+        </div>
+
+        <!-- CANAL 2: Los 2000 -->
+        <div class="channel">
+            <div class="channel-title">Sesiones<br>Los 2000s</div>
+            <div class="knob-container">
+                <div class="knob" style="transform: rotate(30deg);"></div>
+                <div class="knob" style="transform: rotate(-10deg);"></div>
+            </div>
+            <div class="fader-track"><div class="fader-cap" style="transform: translateY(-50px);"></div></div>
+
+            <button class="pad-btn btn-2000s" data-track="Short Mix 10s" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/short-mix-10s/">Short Mix 10s</button>
+            <button class="pad-btn btn-2000s" data-track="Love the twentys 1/3" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/love-the-twentys-13/">Love the twentys 1/3</button>
+            <button class="pad-btn btn-2000s" data-track="Love the twentys 2/3" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/love-the-twenti-s-23/">Love the twentys 2/3</button>
+            <button class="pad-btn btn-2000s" data-track="Love the twentys 3/3" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/love-twenti-s-33/">Love the twentys 3/3</button>
+            <button class="pad-btn btn-2000s" data-track="La banda sonora de mi boda" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/la-banda-sonora-de-mi-boda-2008/">Banda sonora boda</button>
+        </div>
+
+        <!-- CANAL 3: Mashups -->
+        <div class="channel">
+            <div class="channel-title">Sesiones<br>de Mashups</div>
+            <div class="knob-container">
+                <div class="knob" style="transform: rotate(10deg);"></div>
+                <div class="knob" style="transform: rotate(80deg);"></div>
+            </div>
+            <div class="fader-track"><div class="fader-cap" style="transform: translateY(-60px);"></div></div>
+
+            <button class="pad-btn btn-mashup" data-track="Sesión Mashups 90´s" data-link="https://www.mixcloud.com/DJLuichi/mashups-90-s-total-styles/">Mashups 90´s styles</button>
+            <button class="pad-btn btn-mashup" data-track="Sesión Mashups Remix" data-link="https://www.mixcloud.com/DJLuichi/sesi%C3%B3n-mushup-s-remix/">Mashups Remix</button>
+            <button class="pad-btn btn-mashup" data-track="Sesión Mashups Remix 2" data-link="https://www.mixcloud.com/DJLuichi/dj-luichi-mashups-remix-2/">Mashups Remix 2</button>
+        </div>
+
+        <!-- CANAL 4 (NUEVO): Video Mashups Propios -->
+        <div class="channel">
+            <div class="channel-title">Video Mashups<br>Propios</div>
+            <div class="knob-container">
+                <div class="knob" style="transform: rotate(45deg);"></div>
+                <div class="knob" style="transform: rotate(-45deg);"></div>
+            </div>
+            <div class="fader-track"><div class="fader-cap" style="transform: translateY(-10px);"></div></div>
+
+            <!-- Aquí pon el enlace "embed" de YouTube en data-yt -->
+            <button class="pad-btn btn-video" data-track="Video Mashup 1" data-yt="https://www.youtube.com/embed/tgbNymZ7vqY">Video Mashup Vol. 1</button>
+            <button class="pad-btn btn-video" data-track="Video Mashup 2" data-yt="https://www.youtube.com/embed/tgbNymZ7vqY">Video Mashup Vol. 2</button>
+            <button class="pad-btn btn-video" data-track="Video Mashup Live" data-yt="https://www.youtube.com/embed/tgbNymZ7vqY">Live Session Video</button>
+        </div>
+
+        <!-- CANAL 5: Anuales -->
+        <div class="channel">
+            <div class="channel-title">Sesiones<br>Anuales</div>
+            <div class="knob-container">
+                <div class="knob" style="transform: rotate(-10deg);"></div>
+                <div class="knob" style="transform: rotate(45deg);"></div>
+            </div>
+            <div class="fader-track"><div class="fader-cap" style="transform: translateY(-40px);"></div></div>
+
+            <button class="pad-btn btn-anual" data-track="Luis Peláez mix 2026" data-link="https://www.mixcloud.com/DJLuichi/luis-pel%C3%A1ez-mix-2026/">Mix 2026</button>
+            <button class="pad-btn btn-anual" data-track="Luis Peláez mix 2025" data-link="https://www.mixcloud.com/DJLuichi/luis-pel%C3%A1ez-mix-2025/">Mix 2025</button>
+            <button class="pad-btn btn-anual" data-track="Verano mix 2024" data-link="https://www.mixcloud.com/DJLuichi/verano-mix-24/">Verano Mix 2024</button>
+            <button class="pad-btn btn-anual" data-track="Verano mix 2022" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/verano-mix-22-dj-luichi/">Verano Mix 2022</button>
+            <button class="pad-btn btn-anual" data-track="Sesión Octubre 2019" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/sesi%C3%B3n-octubre-2019-comercial/">Octubre 2019</button>
+        </div>
+
+        <!-- CANAL 6: Resto (A DOS COLUMNAS) -->
+        <div class="channel channel-wide">
+            <div class="channel-title">Resto de<br>Sesiones</div>
+            <div class="knob-container">
+                <div class="knob" style="transform: rotate(60deg);"></div>
+                <div class="knob" style="transform: rotate(-60deg);"></div>
+            </div>
+            <div class="fader-track"><div class="fader-cap" style="transform: translateY(-80px);"></div></div>
+
+            <div class="pad-grid">
+                <button class="pad-btn btn-resto" data-track="Dance Mix 2025" data-link="https://www.mixcloud.com/DJLuichi/dance-mix-2025/">Dance Mix 2025</button>
+                <button class="pad-btn btn-resto" data-track="Christmas Megamix" data-link="https://www.mixcloud.com/DJLuichi/christmas-megamix-dj-luichi-pel%C3%A1ez/">Christmas Megamix</button>
+                <button class="pad-btn btn-resto" data-track="Carmen PH 2022" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/carmen-ph-recopilatorio-2022/">Carmen PH 2022</button>
+                <button class="pad-btn btn-resto" data-track="Carmen PH 2021" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/carmen-ph-mix-2021/">Carmen PH 2021</button>
+                <button class="pad-btn btn-resto" data-track="Ciclo indoor 2021" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/dance-ciclo-indoor-sesi%C3%B3n-2021/">Ciclo Indoor 2021</button>
+                <button class="pad-btn btn-resto" data-track="Despedida Ana" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/sesion-carmen-mar%C3%ADa-despedida-ana/">CM despedida Ana</button>
+                <button class="pad-btn btn-resto" data-track="Sesion hija Carmen" data-link="https://www.mixcloud.com/luis-pel%C3%A1ez-palomino/sesion-2019-para-mi-hija-carmen/">Para mi hija Carmen</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- REPRODUCTOR FIJO INFERIOR -->
+    <div class="player-bar">
+        <div class="player-screen" id="display-screen">
+            -- ESPERANDO PISTA --
+        </div>
+    </div>
+
+    <!-- MODAL DE YOUTUBE -->
+    <div class="video-modal" id="video-modal">
+        <div class="video-container">
+            <iframe id="yt-iframe" width="100%" height="100%" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <button class="close-video-btn" onclick="cerrarVideo()">CERRAR VÍDEO</button>
+    </div>
+
+    <!-- SCRIPT DE INTERACTIVIDAD -->
+    <script>
+        // --- FUNCIÓN DE CAMBIO DE TEMA ---
+        function cambiarTema(tema) {
+            document.body.setAttribute('data-theme', tema);
+        }
+
+        // --- LÓGICA DE REPRODUCTORES ---
+        const buttons = document.querySelectorAll('.pad-btn');
+        const playerBar = document.querySelector('.player-bar');
+        const videoModal = document.getElementById('video-modal');
+        const ytIframe = document.getElementById('yt-iframe');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', function() {
+                const trackName = this.getAttribute('data-track');
+                const mixcloudLink = this.getAttribute('data-link');
+                const ytLink = this.getAttribute('data-yt');
+                
+                // Si es un vídeo de YouTube
+                if (ytLink) {
+                    ytIframe.src = ytLink + "?autoplay=1"; // Carga el vídeo y le da al play
+                    videoModal.style.display = 'flex'; // Muestra el modal
+                    
+                    // Actualiza la pantallita de abajo por si acaso
+                    playerBar.innerHTML = `<div class="player-screen" id="display-screen">▶ VIENDO VÍDEO: ${trackName}</div>`;
+                } 
+                // Si es un audio de Mixcloud
+                else if (mixcloudLink) {
+                    const encodedUrl = encodeURIComponent(mixcloudLink);
+                    playerBar.innerHTML = `
+                        <iframe width="100%" height="60" 
+                            src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=0&autoplay=1&feed=${encodedUrl}" 
+                            frameborder="0" >
+                        </iframe>
+                    `;
+                } 
+                // Si no tiene enlace
+                else {
+                    playerBar.innerHTML = `<div class="player-screen" id="display-screen">-- ESPERANDO PISTA --</div>`;
+                    const screen = document.getElementById('display-screen');
+                    screen.textContent = "CARGANDO: " + trackName + "...";
+                    screen.style.color = "#fff";
+                    
+                    setTimeout(() => {
+                        screen.textContent = "▶ REPRODUCIENDO: " + trackName;
+                        screen.style.color = "#0f0";
+                    }, 800);
+                }
+            });
+        });
+
+        // --- FUNCIÓN PARA CERRAR EL VÍDEO ---
+        function cerrarVideo() {
+            videoModal.style.display = 'none'; // Oculta el modal
+            ytIframe.src = ""; // Corta la reproducción del vídeo
+            playerBar.innerHTML = `<div class="player-screen" id="display-screen">-- ESPERANDO PISTA --</div>`;
+        }
+    </script>
+
+</body>
+</html>
