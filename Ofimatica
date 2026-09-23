@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofimática Aplicada al Comercio Alimentario | Portal UD1</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #059669;
+            --warning: #d97706;
+            --bg-main: #f1f5f9;
+            --surface: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border: #cbd5e1;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-bottom: 4rem;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--primary-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.25rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            border-radius: var(--radius);
+            max-width: 1200px;
+            margin: 2rem auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .hero h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+        .hero p { opacity: 0.95; max-width: 850px; font-size: 1.1rem; }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+            color: var(--text-main);
+            border-left: 5px solid var(--primary);
+            padding-left: 0.75rem;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card-interactive {
+            cursor: pointer;
+        }
+
+        .card-interactive:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        .badge-word { background: #dbeafe; color: #1e40af; }
+        .badge-ppt { background: #fef3c7; color: #92400e; }
+        .badge-eval { background: #fee2e2; color: #991b1b; }
+
+        .time-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+            margin-top: 1rem;
+            background: var(--bg-main);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .time-step {
+            background: var(--surface);
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+        }
+
+        .time-step strong { display: block; color: var(--primary); margin-bottom: 0.25rem; }
+
+        /* Control de Vistas y Filtros */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn, .view-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active, .view-btn.active, .filter-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Subpáginas */
+        .subpage {
+            display: none;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .subpage.active {
+            display: block;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-back {
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-back:hover { background: #e2e8f0; }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .info-table th, .info-table td {
+            border: 1px solid var(--border);
+            padding: 0.75rem 0.85rem;
+            text-align: left;
+        }
+
+        .info-table th { background: var(--bg-main); font-weight: 700; }
+        .info-table tbody tr:hover { background-color: #f8fafc; }
+
+        ul.check-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul.check-list li {
+            position: relative;
+            padding-left: 1.8rem;
+            margin-bottom: 0.6rem;
+        }
+
+        ul.check-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .file-code {
+            background: #e2e8f0;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #0f172a;
+        }
+
+        /* Estilos específicos para el contenido de las Fichas */
+        .ficha-header {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-left: 6px solid var(--primary);
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .ficha-header h2 {
+            color: #0369a1;
+            font-size: 1.3rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .ficha-header p {
+            color: #0c4a6e;
+            font-size: 0.95rem;
+        }
+
+        .theory-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .theory-box h3 {
+            color: var(--primary-dark);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .glossary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .glossary-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .glossary-card strong {
+            color: var(--primary-dark);
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
+        }
+
+        .magic-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .magic-btn-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.65rem 0.85rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-badge {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: var(--primary-dark);
+            font-weight: 800;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-family: monospace;
+            min-width: 32px;
+            text-align: center;
+        }
+
+        .gold-rule {
+            background: #fffbebf5;
+            border: 1px solid #fde68a;
+            border-left: 5px solid var(--warning);
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            color: #78350f;
+            margin: 1.25rem 0;
+        }
+
+        .gold-rule strong { color: #92400e; }
+
+        .step-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        .step-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .step-title {
+            font-weight: 700;
+            color: var(--primary-dark);
+            font-size: 1.05rem;
+        }
+
+        .step-time-tag {
+            background: #f1f5f9;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .sample-text-box {
+            background: #f8fafc;
+            border: 1px dashed #94a3b8;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: #1e293b;
+            margin: 0.75rem 0;
+            line-height: 1.5;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0.75rem 0;
+        }
+
+        .schedule-table th, .schedule-table td {
+            border: 1px solid var(--border);
+            padding: 0.6rem 0.8rem;
+            font-size: 0.88rem;
+        }
+
+        .schedule-table th {
+            background: #e0f2fe;
+            color: #0369a1;
+            font-weight: 700;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo" onclick="showView('hub')">🛒 Ofimática Comercial</div>
+            <ul class="nav-links">
+                <li><a onclick="showView('hub')">Inicio</a></li>
+                <li><a onclick="showView('guia')">Guía del Módulo</a></li>
+                <li><a onclick="showView('ud1')">UD1 (24 Sesiones)</a></li>
+                <li><a onclick="showView('evaluacion')">Evaluación & DUA</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="main-container">
+
+        <!-- VISTA 1: PANEL PRINCIPAL (HUB) -->
+        <div id="view-hub" class="subpage active">
+            <section class="hero">
+                <h1>Ofimática Aplicada al Comercio Alimentario</h1>
+                <p>Módulo Profesional | Proyecto Integrado Anual: <strong>"Mi Comercio Alimentario"</strong>. Diseña la identidad digital, tarifas, presupuestos, catálogos e inventario automatizado de tu propia tienda.</p>
+            </section>
+
+            <h2 class="section-title">Estructura de Cada Clase (60 Minutos)</h2>
+            <div class="time-box">
+                <div class="time-step"><strong>10 Min</strong> Activación & Glosario</div>
+                <div class="time-step"><strong>15 Min</strong> Demostración "Yo lo hago"</div>
+                <div class="time-step"><strong>25 Min</strong> Práctica "Tú lo haces"</div>
+                <div class="time-step"><strong>10 Min</strong> Comprobación y Guardado</div>
+            </div>
+
+            <h2 class="section-title">Unidades Didácticas del Curso</h2>
+            <div class="grid-3">
+                <div class="card card-interactive" onclick="showView('ud1')">
+                    <span class="badge badge-word">24 Horas · Trimestre 1</span>
+                    <h3 style="margin-top:0.5rem;">UD 1: Documentos y Presentaciones Comerciales</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Word 365 y PowerPoint 365. Creación del dossier de tienda, cartas, tarifas y presentación de productos.</p>
+
+                    <strong style="color:var(--primary); font-size:0.85rem; display:inline-block; margin-top:0.75rem;">Explorar las 24 Sesiones Completa →</strong>
+                </div>
+
+                <div class="card">
+                    <span class="badge badge-ppt">16 Horas · Trimestre 1</span>
+                    <h3 style="margin-top:0.5rem;">UD 2: Carteles, Folletos y Ofertas</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Canva y Plantillas Word. Publicidad comercial, etiquetas de precio y trípticos para el escaparate.</p>
+                </div>
+
+                <div class="card">
+                    <span class="badge badge-word">32 Horas · Trimestre 2</span>
+                    <h3 style="margin-top:0.5rem;">UD 3: Hoja de Cálculo para el Comercio</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Microsoft Excel. Control de stock, IVA, alertas automáticas de bajo stock y gráficos de ventas.</p>
+                </div>
+
+                <div class="card">
+                    <span class="badge badge-ppt">28 Horas · Trimestre 2-3</span>
+                    <h3 style="margin-top:0.5rem;">UD 4: Bases de Datos y CRM</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Microsoft Access. Fichas de proveedores, inventario de productos y gestión digital de clientes.</p>
+                </div>
+
+                <div class="card">
+                    <span class="badge badge-eval">20 Horas · Trimestre 3</span>
+                    <h3 style="margin-top:0.5rem;">UD 5: Archivo Digital, Correo y RGPD</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Estructura de carpetas, correo profesional y protección de datos en la tienda.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 2: PROGRAMACIÓN UD1 (24 SESIONES INTEGRADAS) -->
+        <div id="view-ud1" class="subpage">
+            <button class="btn-back" onclick="showView('hub')">← Volver al Panel Principal</button>
+            <h2>Unidad Didáctica 1: Documentos y Presentaciones Comerciales</h2>
+            <p style="color:var(--text-muted); margin-bottom: 1.5rem;">24 Sesiones calendarizadas | Herramientas: Word 365, PowerPoint 365 y Teams.</p>
+
+            <div class="controls-bar">
+                <div class="filter-bar">
+                    <button class="filter-btn active" onclick="filterSessions('all')">Todas (24)</button>
+                    <button class="filter-btn" onclick="filterSessions('word')">Bloque A: Word 365 (14h)</button>
+                    <button class="filter-btn" onclick="filterSessions('ppt')">Bloque B: PowerPoint (8h)</button>
+                    <button class="filter-btn" onclick="filterSessions('eval')">Bloque C: Repaso & Evaluación (2h)</button>
+                </div>
+                <div>
+                    <button class="view-btn active" id="btn-view-grid" onclick="toggleLayout('grid')">🔲 Tarjetas</button>
+                    <button class="view-btn" id="btn-view-table" onclick="toggleLayout('table')">📋 Tabla General</button>
+                </div>
+            </div>
+
+            <!-- VISTA TARJETAS -->
+            <div class="grid-3" id="sessions-grid"></div>
+
+            <!-- VISTA TABLA -->
+            <div id="sessions-table-wrapper" style="display: none; overflow-x: auto;">
+                <table class="info-table" id="sessions-table">
+                    <thead>
+                        <tr>
+                            <th>Sesión</th>
+                            <th>Fecha</th>
+                            <th>Ficha Guía Adjunta</th>
+                            <th>Título de la Actividad</th>
+                            <th>Entregable / Archivo</th>
+                            <th>Criterios</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- VISTA 3: FICHA DE SESIÓN INDIVIDUAL -->
+        <div id="view-session-detail" class="subpage">
+            <button class="btn-back" onclick="showView('ud1')">← Volver al listado de sesiones</button>
+            <div id="session-detail-content"></div>
+        </div>
+
+        <!-- VISTA 4: GUÍA DEL MÓDULO & REGLAS -->
+        <div id="view-guia" class="subpage">
+            <button class="btn-back" onclick="showView('hub')">← Volver al Panel Principal</button>
+            <h2>Guía Docente y Organización del Módulo</h2>
+            <div class="grid-2" style="margin-top:1.5rem;">
+                <div class="card">
+                    <h3>🗓️ Horario Semanal (4h / semana)</h3>
+                    <table class="info-table">
+                        <tr><th>Día</th><th>Tipo</th><th>Bloque Temático</th></tr>
+                        <tr><td>Lunes (1h)</td><td>Práctica Aula</td><td>Procesador de Textos / Maquetación</td></tr>
+                        <tr><td>Martes (1h)</td><td>Práctica Aula</td><td>Procesador de Textos / Maquetación</td></tr>
+                        <tr><td>Miércoles</td><td>-</td><td>Sin Clase</td></tr>
+                        <tr><td>Jueves (1h)</td><td>Práctica Aula</td><td>Presentaciones Digitales / Hoja de Cálculo</td></tr>
+                        <tr><td>Viernes (1h)</td><td>Práctica Aula</td><td>Presentaciones Digitales / Hoja de Cálculo</td></tr>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h3>📌 Decálogo de Funcionamiento en Aula</h3>
+                    <ul class="check-list">
+                        <li><strong>Ritmo propio y sin prisas:</strong> Avanzamos paso a paso sin competir.</li>
+                        <li><strong>Guardado obligatorio:</strong> Guardar siempre en la carpeta oficial antes del timbre.</li>
+                        <li><strong>Preguntar sin miedo:</strong> Levantaremos la mano ante cualquier bloqueo.</li>
+                        <li><strong>Glosario de ayuda:</strong> Consulta de términos técnicos clave en cada ficha.</li>
+                        <li><strong>Cuidado del equipo:</strong> Respeto total al ordenador e instalaciones asignadas.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 5: EVALUACIÓN Y DUA -->
+        <div id="view-evaluacion" class="subpage">
+            <button class="btn-back" onclick="showView('hub')">← Volver al Panel Principal</button>
+            <h2>Criterios de Calificación y Estrategias DUA</h2>
+            <div class="grid-3" style="margin-top:1.5rem;">
+                <div class="card" style="border-top: 4px solid var(--primary);">
+                    <h1 style="font-size: 2.5rem; color:var(--primary);">70%</h1>
+                    <h3>Portafolio Digital</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Carpeta del comercio en Teams con todos los ejercicios y archivos terminados. Se valora el acabado, formato y corrección.</p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--secondary);">
+                    <h1 style="font-size: 2.5rem; color:var(--secondary);">20%</h1>
+                    <h3>Trabajo Diario</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Puntualidad, atención a las demostraciones y cumplimiento de las fichas de comprobación de logros cotidianas.</p>
+                </div>
+
+                <div class="card" style="border-top: 4px solid var(--warning);">
+                    <h1 style="font-size: 2.5rem; color:var(--warning);">10%</h1>
+                    <h3>Micro-Retos Presenciales</h3>
+                    <p style="color:var(--text-muted); font-size:0.9rem;">Pruebas individuales de maquetación guiadas con acceso total a apuntes y guías paso a paso.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Datos completos de las 24 sesiones de la UD1
+        const sesionesData = [
+            {
+                id: 1,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Jueves',
+                ficha: 'Ficha 1: El Procesador de Textos (Microsoft Word)',
+                titulo: 'Inicio del Portafolio y Documento Inicial',
+                doc: '01_Presentacion_Tienda',
+                desc: 'Creación de carpeta personal en Teams y documento inicial con datos de contacto.',
+                pasoApaso: 'Creación de la carpeta Mi_Tienda_[TuNombre] en Teams. Redacción de datos de contacto y especialidad de la tienda en Word 365 (01_Presentacion_Tienda). Aplicación de formato (20pt, Negrita, Centrado, Azul) y guardado.',
+                ce: 'CE 5.1, CE 5.2'
+            },
+            {
+                id: 2,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Viernes',
+                ficha: 'Ficha 1: El Procesador de Textos (Microsoft Word)',
+                titulo: 'Horario Comercial y Exportación PDF',
+                doc: '01_Presentacion_Tienda.pdf',
+                desc: 'Inserción y formato de tabla (2x6) con horario comercial de la tienda.',
+                pasoApaso: 'Inserción de tabla de 2 columnas por 6 filas para el horario comercial. Aplicación de sombreado azul claro a la cabecera, verificación de autoguardado y descarga en PDF (01_Presentacion_Tienda.pdf).',
+                ce: 'CE 1.1, CE 1.2, CE 1.4'
+            },
+            {
+                id: 3,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Lunes 28 Sept',
+                ficha: 'Ficha 2: Catálogo de Productos e Imágenes Comerciales',
+                titulo: 'Catálogo de Ofertas - Frutas y Verduras',
+                doc: '02_Catalogo_Ofertas',
+                desc: 'Creación del documento de ofertas, listas con viñetas e imágenes ajustadas.',
+                pasoApaso: 'Creación de 02_Catalogo_Ofertas en Teams. Título centrado en verde oscuro 20pt, lista con viñetas para frutas y verduras, e inserción/ajuste de imagen comercial.',
+                ce: 'CE 1.1, CE 1.2'
+            },
+            {
+                id: 4,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Martes 29 Sept',
+                ficha: 'Ficha 2: Catálogo de Productos e Imágenes Comerciales',
+                titulo: 'Panadería y Cartel "Súper Oferta"',
+                doc: '02_Catalogo_Ofertas.pdf',
+                desc: 'Sección de panadería y cartel promocional con relleno de color.',
+                pasoApaso: 'Lista con viñetas para panadería y embutidos. Creación del cuadro "Súper Oferta de la Semana" usando formas con relleno llamativo. Exportación a PDF (02_Catalogo_Ofertas.pdf) y entrega en Teams.',
+                ce: 'CE 1.1, CE 1.4'
+            },
+            {
+                id: 5,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Jueves 1 Oct',
+                ficha: 'Ficha 3: Carta Comercial de Bienvenida y Formato Formal',
+                titulo: 'Carta Comercial - Estructura y Sangrías',
+                doc: '03_Carta_Comercial',
+                desc: 'Redacción de carta comercial con sangrías e interlineado formal.',
+                pasoApaso: 'Creación del documento 03_Carta_Comercial. Redacción de fecha alineada a la derecha y cuerpo de bienvenida. Configuración de márgenes normales, alineación justificada, sangría de primera línea a 1,25 cm e interlineado 1.15.',
+                ce: 'CE 1.1'
+            },
+            {
+                id: 6,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Viernes 2 Oct',
+                ficha: 'Ficha 3: Carta Comercial de Bienvenida y Formato Formal',
+                titulo: 'Encabezado Corporativo y Firma Digital',
+                doc: '03_Carta_Comercial.pdf',
+                desc: 'Inserción del logotipo en encabezado y firma digitalizada del gerente.',
+                pasoApaso: 'Edición del encabezado corporativo con inserción de logotipo. Inserción de imagen de firma digitalizada sobre el cargo de dirección. Exportación a PDF (03_Carta_Comercial.pdf) y entrega en Teams.',
+                ce: 'CE 1.1, CE 1.4'
+            },
+            {
+                id: 7,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Lunes 5 Oct',
+                ficha: 'Ficha 4: Manual de Normas Internas de Trabajo y Reglamento',
+                titulo: 'Manual de Normas - Listas Numeradas',
+                doc: '04_Normas_Internas',
+                desc: 'Configuración de lista numerada automática para atención comercial.',
+                pasoApaso: 'Creación del archivo 04_Normas_Internas. Maquetación de título principal centrado en verde 14pt y configuración de lista numerada automática para 5 reglas de atención comercial.',
+                ce: 'CE 1.1'
+            },
+            {
+                id: 8,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Martes 6 Oct',
+                ficha: 'Ficha 4: Manual de Normas Internas de Trabajo y Reglamento',
+                titulo: 'Cuadro de Aviso e Higiene Alimentaria',
+                doc: '04_Normas_Internas.pdf',
+                desc: 'Normas de higiene, sombreado, bordes y revisión ortográfica F7.',
+                pasoApaso: 'Redacción de protocolo de higiene alimentaria. Creación del cuadro de aviso aplicando sombreado de relleno y borde externo. Revisión del Editor ortográfico (F7), exportación a PDF (04_Normas_Internas.pdf) y entrega.',
+                ce: 'CE 1.1, CE 5.2'
+            },
+            {
+                id: 9,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Jueves 8 Oct',
+                ficha: 'Ficha 5: Plantillas de Comunicados a Clientes y Notas Informativas',
+                titulo: 'Comunicado Formal de Festivo',
+                doc: '05_Comunicados_Clientes',
+                desc: 'Redacción de comunicado formal de festivos y horario especial.',
+                pasoApaso: 'Creación de 05_Comunicados_Clientes. Maquetación del encabezado comercial, título destacado en verde 16pt y redacción del aviso de horario especial justificado.',
+                ce: 'CE 1.1'
+            },
+            {
+                id: 10,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Viernes 9 Oct',
+                ficha: 'Ficha 5: Plantillas de Comunicados a Clientes y Notas Informativas',
+                titulo: 'Tabulaciones Avanzadas y Cartel Escaparate',
+                doc: '05_Comunicados_Clientes.pdf',
+                desc: 'Tabulaciones a 15 cm con puntos de relleno para cartelería.',
+                pasoApaso: 'Configuración de tabulaciones a 15 cm alineadas a la derecha con puntos de relleno (....) utilizando la tecla TAB. Formato de cartel de escaparate con fondo verde claro y borde. Entrega en PDF (05_Comunicados_Clientes.pdf).',
+                ce: 'CE 1.1, CE 1.4'
+            },
+            {
+                id: 11,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Martes 13 Oct',
+                ficha: 'Ficha 6: Tarifario de Productos y Tablas Comercial Avanzadas',
+                titulo: 'Tarifario de Productos - Estructura de Tabla',
+                doc: '06_Tarifario_Productos',
+                desc: 'Creación de tabla 4x10 con combinación de celdas por sección.',
+                pasoApaso: 'Creación de 06_Tarifario_Productos. Inserción de tabla 4x10 con cabeceras principales y combinación de celdas para definir secciones de producto (Charcutería, Frutería).',
+                ce: 'CE 1.2'
+            },
+            {
+                id: 12,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Jueves 15 Oct',
+                ficha: 'Ficha 6: Tarifario de Productos y Tablas Comercial Avanzadas',
+                titulo: 'Estilos de Tabla y Alineación Decimal',
+                doc: '06_Tarifario_Productos.pdf',
+                desc: 'Estilos comerciales, sombreado verde, alineación decimal de precios.',
+                pasoApaso: 'Aplicación de sombreado verde oscuro y texto blanco en cabeceras. Alineación a la derecha de los precios con símbolo €, bordes finos de 0,5 pt, exportación a PDF (06_Tarifario_Productos.pdf) y entrega.',
+                ce: 'CE 1.2'
+            },
+            {
+                id: 13,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Viernes 16 Oct',
+                ficha: 'Ficha 7: Dossier Comercial Multipágina de la Tienda',
+                titulo: 'Dossier Multipágina - Saltos y Encabezados',
+                doc: '07_Dossier_Tienda',
+                desc: 'Maquetación de 3 páginas con saltos (Ctrl + Enter) y numeración de página.',
+                pasoApaso: 'Creación de 07_Dossier_Tienda. Estructuración de 3 páginas mediante saltos de página (Ctrl + Enter) y configuración de pie de página con numeración automática omitiéndola en la portada.',
+                ce: 'CE 1.1'
+            },
+            {
+                id: 14,
+                bloque: 'word',
+                badge: 'badge-word',
+                fecha: 'Lunes 19 Oct',
+                ficha: 'Ficha 7: Dossier Comercial Multipágina de la Tienda',
+                titulo: 'Consolidación de Word y Editor F7',
+                doc: '07_Dossier_Tienda.pdf',
+                desc: 'Revisión 100% Editor F7, exportación a PDF y auditoría del Bloque A.',
+                pasoApaso: 'Revisión completa con el Editor de Word (F7) hasta alcanzar el 100%. Exportación a PDF (07_Dossier_Tienda.pdf) y comprobación de la presencia de los 7 PDFs del Bloque A en la carpeta de Teams.',
+                ce: 'CE 1.4, CE 5.2'
+            },
+            {
+                id: 15,
+                bloque: 'ppt',
+                badge: 'badge-ppt',
+                fecha: 'Martes 20 Oct',
+                ficha: 'Ficha 8: Presentación Digital Comercial en PowerPoint 365',
+                titulo: 'PowerPoint 365 - Portada Corporativa',
+                doc: '08_Presentacion_Comercial',
+                desc: 'Creación de la presentación comercial y portada con Tema Verde.',
+                pasoApaso: 'Creación del archivo 08_Presentacion_Comercial en Teams. Selección del Tema Verde Corporativo y maquetación de la Diapositiva 1 (Portada con Título y Subtítulo).',
+                ce: 'CE 5.1, CE 5.2'
+            },
+            {
+                id: 16,
+                bloque: 'ppt',
+                badge: 'badge-ppt',
+                fecha: 'Miércoles 21 / Jueves 22 Oct',
+                ficha: 'Ficha 8: Presentación Digital Comercial en PowerPoint 365',
+                titulo: 'Diapositiva 2: Quiénes Somos y Visión',
+                doc: '08_Presentacion_Comercial',
+                desc: 'Redacción de la visión de la tienda e imagen del establecimiento.',
+                pasoApaso: 'Creación de la Diapositiva 2 con el diseño "Título y objetos". Redacción de la visión de la tienda e inserción de imagen de las instalaciones.',
+                ce: 'CE 1.1'
+            },
+            {
+                id: 17,
+                bloque: 'ppt',
+                badge: 'badge-ppt',
+                fecha: 'Viernes 23 Oct',
+                ficha: 'Ficha 8: Presentación Digital Comercial en PowerPoint 365',
+                titulo: 'Diapositiva 3: Fichas Visuales de Producto',
+                doc: '08_Presentacion_Comercial',
+                desc: 'Inserción de 3 productos estrella y etiquetas de precio.',
+                pasoApaso: 'Diseñar la Diapositiva 3 con fichas de producto. Inserción de 3 imágenes de productos alimentarios estrella con etiquetas de precios mediante rectángulos redondeados.',
+                ce: 'CE 1.2'
+            },
+            {
+                id: 18,
+                bloque: 'ppt',
+                badge: 'badge-ppt',
+                fecha: 'Lunes 26 Oct',
+                ficha: 'Ficha 8: Presentación Digital Comercial en PowerPoint 365',
+                titulo: 'Diapositiva 4: Ofertas DUA y Gran Formato',
+                doc: '08_Presentacion_Comercial',
+                desc: 'Diseño accesible DUA con texto de alto contraste a 28pt.',
+                pasoApaso: 'Diseñar la Diapositiva 4 (Ofertas Promocionales) aplicando criterios DUA: textos de gran tamaño (28pt) y alto contraste entre fuente y fondo.',
+                ce: 'CE 1.1'
+            },
+            {
+                id: 19,
+                bloque: 'ppt',
+                badge: 'badge-ppt',
+                fecha: 'Martes 27 Oct',
+                ficha: 'Ficha 8: Presentación Digital Comercial en PowerPoint 365',
+                titulo: 'Transiciones y Animaciones Sencillas',
+                doc: '08_Presentacion_Comercial',
+                desc: 'Transiciones suaves y efectos de entrada para resaltar precios.',
+                pasoApaso: 'Configuración del efecto de transición (Atenuar o Empuje) aplicado a todas las diapositivas. Añadir animaciones sencillas de entrada (Aparecer) en las etiquetas de precio.',
+                ce: 'CE 1.1'
+            },
+            {
+                id: 20,
+                bloque: 'ppt',
+                badge: 'badge-ppt',
+                fecha: 'Miércoles 28 / Jueves 29 Oct',
+                ficha: 'Ficha 8: Presentación Digital Comercial en PowerPoint 365',
+                titulo: 'Notas del Orador y Guión de Exposición',
+                doc: '08_Presentacion_Comercial',
+                desc: 'Redacción del guión de apoyo verbal en las notas de cada diapositiva.',
+                pasoApaso: 'Apertura de la zona de Notas del Orador en cada diapositiva y redacción del guión de apoyo para la exposición verbal.',
+                ce: 'CE 1.1'
+            },
+            {
+                id: 21,
+                bloque: 'ppt',
+                badge: 'badge-ppt',
+                fecha: 'Viernes 30 Oct / Lunes 2 Nov',
+                ficha: 'Ficha 8: Presentación Digital Comercial en PowerPoint 365',
+                titulo: 'Exportación a PDF de PowerPoint',
+                doc: '08_Presentacion_Comercial.pdf',
+                desc: 'Exportación técnica a PDF desde PowerPoint 365.',
+                pasoApaso: 'Exportación técnica del documento de PowerPoint a formato PDF (08_Presentacion_Comercial.pdf) desde el menú Archivo > Guardar como.',
+                ce: 'CE 1.4, CE 5.2'
+            },
+            {
+                id: 22,
+                bloque: 'ppt',
+                badge: 'badge-ppt',
+                fecha: 'Martes 3 Nov',
+                ficha: 'Ficha 8: Presentación Digital Comercial en PowerPoint 365',
+                titulo: 'Ensayo General y Exposición Oral (2 min)',
+                doc: '08_Presentacion_Comercial.pdf',
+                desc: 'Ensayos a pantalla completa (F5) y entrega final en Teams.',
+                pasoApaso: 'Ensayos individuales a pantalla completa (tecla F5) de la exposición oral de 2 minutos y entrega del PDF final en Teams.',
+                ce: 'CE 1.1, CE 1.4'
+            },
+            {
+                id: 23,
+                bloque: 'eval',
+                badge: 'badge-eval',
+                fecha: 'Jueves 5 Nov',
+                ficha: 'Ficha 9: Guía de Auditoría del Portafolio Digital y Evaluación Presencial',
+                titulo: 'Auditoría del Portafolio Digital en Teams',
+                doc: 'Portafolio Completo UD1 (8 PDFs)',
+                desc: 'Comprobación de la carpeta Mi_Tienda_[Nombre] y los 8 PDFs entregados.',
+                pasoApaso: 'Auditoría del Portafolio Digital en Teams: verificación del nombre de la carpeta (Mi_Tienda_[TuNombre]) y comprobación de la presencia de los 8 archivos PDF con sus nombres exactos (01 a 08). Reentrega de tareas pendientes.',
+                ce: 'CE 5.1, CE 5.2'
+            },
+            {
+                id: 24,
+                bloque: 'eval',
+                badge: 'badge-eval',
+                fecha: 'Viernes 6 Nov',
+                ficha: 'Ficha 9: Guía de Auditoría del Portafolio Digital y Evaluación Presencial',
+                titulo: 'Examen Práctico Presencial (60 Min)',
+                doc: 'Prueba Práctica Presencial',
+                desc: 'Prueba práctica individual en ordenador de maquetación en Word y PPT.',
+                pasoApaso: 'Examen Práctico Presencial en el Aula (60 minutos). Maquetación rápida desde cero en Word y PowerPoint de un documento comercial integrando tablas, sangrías, encabezados, diapositivas DUA y exportación inmediata a PDF.',
+                ce: 'CE 1.1, 1.2, 1.4, 5.1, 5.2'
+            }
+        ];
+
+        let currentFilteredSessions = [...sesionesData];
+
+        function renderSessionsGrid(data) {
+            const grid = document.getElementById('sessions-grid');
+            grid.innerHTML = '';
+            data.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'card card-interactive';
+                card.onclick = () => openSessionDetail(s.id);
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span class="badge ${s.badge}">Sesión ${s.id < 10 ? '0' + s.id : s.id}</span>
+                        <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">${s.fecha}</span>
+                    </div>
+                    <h3 style="margin:0.5rem 0 0.25rem 0; font-size:1.05rem;">${s.titulo}</h3>
+                    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:0.5rem;">${s.desc}</p>
+                    <div style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">${s.ficha}</div>
+                    <div style="margin-top:0.8rem; padding-top:0.5rem; border-top:1px solid var(--border); font-size:0.8rem; display:flex; justify-content:space-between; align-items:center;">
+                        <span class="file-code">📄 ${s.doc}</span>
+                        <span style="color:var(--primary); font-weight:600;">Ver Ficha →</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function renderSessionsTable(data) {
+            const tbody = document.querySelector('#sessions-table tbody');
+            tbody.innerHTML = '';
+            data.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge ${s.badge}">Sesión ${s.id < 10 ? '0' + s.id : s.id}</span></td>
+                    <td><strong>${s.fecha}</strong></td>
+                    <td style="font-size:0.85rem;">${s.ficha}</td>
+                    <td><strong>${s.titulo}</strong></td>
+                    <td><span class="file-code">${s.doc}</span></td>
+                    <td style="font-size:0.8rem;">${s.ce}</td>
+                    <td><button style="padding:0.25rem 0.6rem; font-size:0.8rem; cursor:pointer;" onclick="openSessionDetail(${s.id})">Ver Ficha</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterSessions(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (category === 'all') {
+                currentFilteredSessions = [...sesionesData];
+            } else {
+                currentFilteredSessions = sesionesData.filter(s => s.bloque === category);
+            }
+
+            renderSessionsGrid(currentFilteredSessions);
+            renderSessionsTable(currentFilteredSessions);
+        }
+
+        function toggleLayout(type) {
+            const gridView = document.getElementById('sessions-grid');
+            const tableView = document.getElementById('sessions-table-wrapper');
+            const btnGrid = document.getElementById('btn-view-grid');
+            const btnTable = document.getElementById('btn-view-table');
+
+            if (type === 'grid') {
+                gridView.style.display = 'grid';
+                tableView.style.display = 'none';
+                btnGrid.classList.add('active');
+                btnTable.classList.remove('active');
+            } else {
+                gridView.style.display = 'none';
+                tableView.style.display = 'block';
+                btnGrid.classList.remove('active');
+                btnTable.classList.add('active');
+            }
+        }
+
+        // Renderizado del contenido completo de la Ficha 1 para las Sesiones 1 y 2
+        function renderFicha1Content(session) {
+            const isSession1 = session.id === 1;
+
+            return `
+                <div class="ficha-header">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.4rem;">
+                        <span class="badge badge-word">UD 1: DOCUMENTOS COMERCIALES · FICHA 1</span>
+                        <span style="font-weight:700; color:var(--primary-dark); font-size:0.9rem;">Criterios: ${session.ce}</span>
+                    </div>
+                    <h2>El Procesador de Textos (Microsoft Word)</h2>
+                    <p>Contenido oficial e íntegro correspondiente a la <strong>Sesión ${session.id} (${session.fecha})</strong> del proyecto "Mi Comercio Alimentario".</p>
+                </div>
+
+                <!-- BLOQUE TEÓRICO Y GLOSARIO COMPLETO DE LA FICHA 1 -->
+                <div class="theory-box">
+                    <h3>📖 Teoría Mínima: ¿Para qué sirve Word en nuestra tienda de alimentación?</h3>
+                    <p style="font-size:0.95rem; color:var(--text-main);">
+                        Microsoft Word es un programa informático que nos permite escribir y diseñar documentos profesionales para nuestro comercio: desde la carta de presentación de la tienda, hasta las listas de precios, horarios de atención al público y comunicados a proveedores.
+                    </p>
+
+                    <h4 style="margin-top:1.25rem; font-size:1rem; color:var(--primary-dark);">🔤 Glosario Visual de la Clase (3 Palabras Clave)</h4>
+                    <div class="glossary-grid">
+                        <div class="glossary-card">
+                            <strong>1. Cinta de Opciones</strong>
+                            <p style="font-size:0.85rem; color:var(--text-muted);">Es la barra superior donde están todos los botones y herramientas (Inicio, Insertar, Formato). Es como nuestra caja de herramientas.</p>
+                        </div>
+                        <div class="glossary-card">
+                            <strong>2. Formato de Fuente</strong>
+                            <p style="font-size:0.85rem; color:var(--text-muted);">Cambiar el aspecto del texto: hacer la letra más grande, cambiar el color o ponerla en Negrita para resaltar.</p>
+                        </div>
+                        <div class="glossary-card">
+                            <strong>3. Alineación</strong>
+                            <p style="font-size:0.85rem; color:var(--text-muted);">Mover el texto hacia la izquierda, ponerlo en el Centro de la página o llevarlo a la derecha.</p>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top:1.25rem; font-size:1rem; color:var(--primary-dark);">✨ Los 6 Botones Mágicos de Hoy</h4>
+                    <div class="magic-buttons-grid">
+                        <div class="magic-btn-card">
+                            <span class="btn-badge">N</span>
+                            <div><strong>Negrita:</strong> Hace la letra más gruesa para destacar títulos.</div>
+                        </div>
+                        <div class="magic-btn-card">
+                            <span class="btn-badge">18</span>
+                            <div><strong>Tamaño de Fuente:</strong> Aumenta o reduce el tamaño del texto.</div>
+                        </div>
+                        <div class="magic-btn-card">
+                            <span class="btn-badge">A</span>
+                            <div><strong>Color de Fuente:</strong> Cambia el color de las letras seleccionadas.</div>
+                        </div>
+                        <div class="magic-btn-card">
+                            <span class="btn-badge">≡</span>
+                            <div><strong>Centrar Texto:</strong> Coloca el título justo en el medio del folio.</div>
+                        </div>
+                        <div class="magic-btn-card">
+                            <span class="btn-badge">Ctrl+G</span>
+                            <div><strong>Guardar:</strong> Guarda tu trabajo para no perder ningún cambio.</div>
+                        </div>
+                        <div class="magic-btn-card">
+                            <span class="btn-badge">📄 PDF</span>
+                            <div><strong>Exportar a PDF:</strong> Crea un archivo final oficial listo para imprimir.</div>
+                        </div>
+                    </div>
+
+                    <div class="gold-rule">
+                        <strong>📌 Regla de Oro en Ofimática: "Primero Selecciono, Luego Aplico"</strong><br>
+                        <span style="font-size:0.9rem;">Antes de cambiar el tamaño, el color o la alineación de una palabra, siempre debes marcar o seleccionar el texto con el ratón (arrastrando el cursor por encima hasta que se ponga de color azul).</span>
+                    </div>
+                </div>
+
+                <!-- BLOQUE DE PRÁCTICA PASO A PASO ESPECÍFICO DE CADA SESIÓN -->
+                <h3 style="margin-bottom:1rem; color:var(--text-main);">💻 Práctica en el Ordenador (60 Minutos) - ${isSession1 ? 'Sesión 1 (Jueves): Presentación de la Tienda' : 'Sesión 2 (Viernes): Tabla del Horario Comercial'}</h3>
+
+                ${isSession1 ? `
+                    <!-- PASOS COMPLETOS SESIÓN 1 -->
+                    <div class="step-card">
+                        <div class="step-header">
+                            <span class="step-title">PASO 0: Crear la Carpeta Oficial en Microsoft Teams</span>
+                            <span class="step-time-tag">⏱️ 10 Minutos</span>
+                        </div>
+                        <ul class="check-list" style="font-size:0.9rem;">
+                            <li>Abre Microsoft Teams y entra en el equipo de la asignatura.</li>
+                            <li>Haz clic en la pestaña <strong>Archivos</strong> en la parte superior.</li>
+                            <li>Haz clic en el botón <strong>+ Nuevo</strong> y selecciona <strong>Carpeta</strong>.</li>
+                            <li>Escribe como nombre: <span class="file-code">Mi_Tienda_[TuNombre]</span> (Ejemplo: <code>Mi_Tienda_Carlos</code>) y pulsa <strong>Crear</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-header">
+                            <span class="step-title">PASO 1: Abrir Word 365 y Crear el Documento</span>
+                            <span class="step-time-tag">⏱️ 15 Minutos</span>
+                        </div>
+                        <ul class="check-list" style="font-size:0.9rem;">
+                            <li>Entra en la carpeta <span class="file-code">Mi_Tienda_[TuNombre]</span> que acabas de crear dentro de Teams.</li>
+                            <li>Haz clic en <strong>+ Nuevo > Documento de Word</strong> (o abre Word desde el iniciador de aplicaciones de Office 365).</li>
+                            <li>Haz clic en el nombre superior (donde pone Documento) y cámbialo por: <span class="file-code">01_Presentacion_Tienda</span>.</li>
+                            <li>Escribe exactamente el siguiente texto (sustituyendo los datos por los de tu tienda):</li>
+                        </ul>
+                        <div class="sample-text-box">FRUTERÍA Y ALIMENTACIÓN LA HUERTA
+Dirección: Calle Mayor, nº 12
+Teléfono de contacto: 600 123 456
+Responsables: [Escribe aquí tu Nombre y el de tu compañero/a]
+Especialidad: Productos frescos, frutas de temporada y pan artesanal.</div>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-header">
+                            <span class="step-title">PASO 2: Dar Formato Profesional al Texto</span>
+                            <span class="step-time-tag">⏱️ 20 Minutos</span>
+                        </div>
+                        <p style="font-weight:700; font-size:0.9rem; color:var(--primary-dark); margin-bottom:0.4rem;">Formato del Título (Primera línea):</p>
+                        <ul class="check-list" style="font-size:0.9rem; margin-bottom:0.75rem;">
+                            <li>Selecciona el título con el ratón.</li>
+                            <li>Cambia el tamaño de fuente a <strong>20 pt</strong>.</li>
+                            <li>Pulsa en el botón <strong>Negrita (N)</strong>.</li>
+                            <li>Pulsa en el botón <strong>Centrar (≡)</strong>.</li>
+                            <li>Cambia el color de la letra a <strong>Azul Oscuro</strong>.</li>
+                        </ul>
+                        <p style="font-weight:700; font-size:0.9rem; color:var(--primary-dark); margin-bottom:0.4rem;">Formato de los Datos:</p>
+                        <ul class="check-list" style="font-size:0.9rem;">
+                            <li>Selecciona las palabras "Dirección:", "Teléfono:", "Responsables:" y ponlas en <strong>Negrita</strong>.</li>
+                            <li>Asegúrate de que el tamaño del texto sea de <strong>12 pt</strong>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-header">
+                            <span class="step-title">PASO 3: Autoguardado y Exportar a PDF</span>
+                            <span class="step-time-tag">⏱️ 15 Minutos</span>
+                        </div>
+                        <ul class="check-list" style="font-size:0.9rem;">
+                            <li><strong>¡Atención!</strong> En Word 365 tu trabajo se guarda automáticamente en Teams. Comprueba que en la barra superior ponga <strong>"Guardado"</strong>.</li>
+                            <li>Para obtener la copia oficial en PDF: Ve al menú <strong>Archivo > Guardar como</strong>.</li>
+                            <li>Selecciona <strong>Descargar como PDF</strong> y guarda la copia en tu carpeta de tareas con el nombre <span class="file-code">01_Presentacion_Tienda.pdf</span>.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card" style="border-top:4px solid var(--secondary); background:#f0fdf4;">
+                        <h3 style="color:#166534; font-size:1.1rem; margin-bottom:0.75rem;">📋 Checklist de Logros de la Sesión 1</h3>
+                        <ul class="check-list" style="font-size:0.9rem; color:#14532d;">
+                            <li>He creado la carpeta principal de mi tienda en la pestaña Archivos de Teams.</li>
+                            <li>He escrito el título y los datos de contacto sin faltas de ortografía en Word 365.</li>
+                            <li>El título está centrado, en negrita, tamaño 20 pt y color azul.</li>
+                            <li>He verificado el autoguardado en Teams y descargado la versión PDF oficial.</li>
+                        </ul>
+                    </div>
+                ` : `
+                    <!-- PASOS COMPLETOS SESIÓN 2 -->
+                    <div class="step-card">
+                        <div class="step-header">
+                            <span class="step-title">PASO 1: Abrir el Documento en Teams / Office 365</span>
+                            <span class="step-time-tag">⏱️ 10 Minutos</span>
+                        </div>
+                        <ul class="check-list" style="font-size:0.9rem;">
+                            <li>Abre Microsoft Teams y entra en la pestaña <strong>Archivos</strong> dentro de tu carpeta <span class="file-code">Mi_Tienda_[TuNombre]</span>.</li>
+                            <li>Haz clic sobre tu archivo <span class="file-code">01_Presentacion_Tienda</span> para abrirlo en Word Web.</li>
+                            <li>Coloca el cursor debajo del texto que escribiste el jueves y pulsa la tecla <strong>ENTER</strong> dos veces para dejar espacio libre.</li>
+                            <li>Escribe el subtítulo: <strong>HORARIO DE ATENCIÓN AL PÚBLICO</strong> (Ponlo en tamaño <strong>14 pt</strong> y <strong>Negrita</strong>).</li>
+                        </ul>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-header">
+                            <span class="step-title">PASO 2: Insertar una Tabla (2 Columnas x 6 Filas)</span>
+                            <span class="step-time-tag">⏱️ 15 Minutos</span>
+                        </div>
+                        <ul class="check-list" style="font-size:0.9rem; margin-bottom:0.75rem;">
+                            <li>Haz clic en la pestaña superior <strong>Insertar > Tabla</strong>.</li>
+                            <li>Mueve el ratón por la cuadrícula hasta marcar 2 columnas y 6 filas <strong>(2x6)</strong> y haz clic.</li>
+                            <li>Rellena las celdas de la tabla con los siguientes datos exactos:</li>
+                        </ul>
+                        <table class="schedule-table">
+                            <thead>
+                                <tr>
+                                    <th>DÍAS DE LA SEMANA</th>
+                                    <th>HORARIO COMERCIAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Lunes a Viernes</td><td style="text-align:center;">09:00 - 14:00 y 17:00 - 20:30</td></tr>
+                                <tr><td>Sábados</td><td style="text-align:center;">09:00 - 14:00</td></tr>
+                                <tr><td>Domingos</td><td style="text-align:center;">Cerrado por descanso</td></tr>
+                                <tr><td>Festivos de apertura</td><td style="text-align:center;">10:00 - 14:00</td></tr>
+                                <tr><td>Reparto a domicilio</td><td style="text-align:center;">De Lunes a Viernes (Tardes)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-header">
+                            <span class="step-title">PASO 3: Dar Estilo y Color a la Tabla</span>
+                            <span class="step-time-tag">⏱️ 20 Minutos</span>
+                        </div>
+                        <p style="font-weight:700; font-size:0.9rem; color:var(--primary-dark); margin-bottom:0.4rem;">Cabecera de la Tabla (Fila 1):</p>
+                        <ul class="check-list" style="font-size:0.9rem; margin-bottom:0.75rem;">
+                            <li>Selecciona la primera fila (donde pone "DÍAS DE LA SEMANA" y "HORARIO COMERCIAL").</li>
+                            <li>Pon el texto en <strong>Negrita</strong> y <strong>Centrado</strong>.</li>
+                            <li>Ve a la pestaña <strong>Diseño de tabla > Sombreado</strong> y elige un color de fondo <strong>Azul Claro</strong>.</li>
+                        </ul>
+                        <p style="font-weight:700; font-size:0.9rem; color:var(--primary-dark); margin-bottom:0.4rem;">Alineación del Contenido:</p>
+                        <ul class="check-list" style="font-size:0.9rem;">
+                            <li>Selecciona toda la columna de horarios y centra el texto para que quede bien alineado.</li>
+                        </ul>
+                    </div>
+
+                    <div class="step-card">
+                        <div class="step-header">
+                            <span class="step-title">PASO 4: Comprobar Autoguardado y Actualizar PDF</span>
+                            <span class="step-time-tag">⏱️ 15 Minutos</span>
+                        </div>
+                        <ul class="check-list" style="font-size:0.9rem;">
+                            <li>Verifica en la barra superior de Word 365 que el documento indique <strong>Guardado</strong>.</li>
+                            <li>Ve a <strong>Archivo > Guardar como > Descargar como PDF</strong> para actualizar la versión final completada.</li>
+                            <li>Guarda la copia actualizada como <span class="file-code">01_Presentacion_Tienda.pdf</span> dentro de la carpeta oficial.</li>
+                        </ul>
+                    </div>
+
+                    <div class="card" style="border-top:4px solid var(--secondary); background:#f0fdf4;">
+                        <h3 style="color:#166534; font-size:1.1rem; margin-bottom:0.75rem;">📋 Checklist de Logros de la Sesión 2</h3>
+                        <ul class="check-list" style="font-size:0.9rem; color:#14532d;">
+                            <li>He insertado correctamente la tabla de 2 columnas por 6 filas.</li>
+                            <li>He completado todos los horarios de la tienda sin faltas de ortografía.</li>
+                            <li>La fila superior (cabecera) tiene fondo azul claro y texto centrado en negrita.</li>
+                            <li>He verificado el autoguardado en Teams y descargado la versión PDF actualizada.</li>
+                        </ul>
+                    </div>
+                `}
+            `;
+        }
+
+        // Renderizado estándar para el resto de sesiones (3 a 24)
+        function renderGenericSessionContent(session) {
+            return `
+                <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.5rem; flex-wrap:wrap;">
+                    <span class="badge ${session.badge}">Sesión ${session.id}</span>
+                    <span style="color:var(--text-muted); font-size:0.9rem; font-weight:600;">${session.fecha}</span>
+                </div>
+                <h2>${session.titulo}</h2>
+                <p style="color:var(--text-muted); margin-bottom:1.25rem; font-size:0.95rem;">
+                    <strong>Ficha Guía Adjunta:</strong> ${session.ficha}<br>
+                    <strong>Criterios de Evaluación:</strong> ${session.ce}
+                </p>
+
+                <div class="card" style="margin-bottom:1.5rem; background:var(--bg-main);">
+                    <h3>🎯 Objetivo de la Sesión</h3>
+                    <p style="margin-top:0.25rem;">${session.desc}</p>
+                    <p style="margin-top:0.75rem;"><strong>Entregable Final del Día:</strong> <span class="file-code">${session.doc}</span> (Guardar en carpeta Teams)</p>
+                </div>
+
+                <h3>📝 Procedimiento Paso a Paso</h3>
+                <div class="card" style="margin:0.75rem 0 1.5rem 0; border-left:4px solid var(--primary);">
+                    <p>${session.pasoApaso}</p>
+                </div>
+
+                <h3>⏱️ Secuencia Didáctica en el Aula (60 Minutos)</h3>
+                <div class="time-box" style="margin-bottom:1.5rem;">
+                    <div class="time-step"><strong>10 min</strong> Activación y Glosario Visual</div>
+                    <div class="time-step"><strong>15 min</strong> Demostración Profesor ("Yo lo hago")</div>
+                    <div class="time-step"><strong>25 min</strong> Práctica Guiada ("Tú lo haces")</div>
+                    <div class="time-step"><strong>10 min</strong> Comprobación y Guardado en Teams</div>
+                </div>
+
+                <div class="card">
+                    <h3>✅ Checklist de Verificación de Logros</h3>
+                    <ul class="check-list">
+                        <li>Documento / archivo trabajado dentro de la carpeta personal <code>Mi_Tienda_[TuNombre]</code> en Teams.</li>
+                        <li>Formatos, tablas, imágenes o diapositivas configurados según los parámetros de la ficha.</li>
+                        <li>Verificación ortográfica con el Editor de Word / PPT completada.</li>
+                        <li>Exportación a PDF realizada con el nombre exacto de la sesión y subido al canal de Teams.</li>
+                    </ul>
+                </div>
+            `;
+        }
+
+        function openSessionDetail(id) {
+            const session = sesionesData.find(s => s.id === id);
+            if (!session) return;
+
+            const content = document.getElementById('session-detail-content');
+
+            if (session.id === 1 || session.id === 2) {
+                content.innerHTML = renderFicha1Content(session);
+            } else {
+                content.innerHTML = renderGenericSessionContent(session);
+            }
+
+            showView('session-detail');
+        }
+
+        function showView(viewId) {
+            document.querySelectorAll('.subpage').forEach(v => v.classList.remove('active'));
+            const target = document.getElementById('view-' + viewId);
+            if (target) {
+                target.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // Carga inicial
+        document.addEventListener('DOMContentLoaded', () => {
+            renderSessionsGrid(sesionesData);
+            renderSessionsTable(sesionesData);
+        });
+    </script>
+</body>
+</html>
