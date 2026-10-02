@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - A.D. Lopera 26/27</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900" x-data="app()">
+
+    <div class="min-h-screen flex flex-col">
+        
+        <!-- Header -->
+        <header class="bg-blue-900 text-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center">
+                <h1 class="text-2xl font-extrabold tracking-wide flex items-center gap-2">
+                    ⚽ CONTROL TEMPORADA A.D. LOPERA 26/27
+                </h1>
+                <div class="flex space-x-3 mt-3 md:mt-0">
+                    <button @click="activeTab = 'plantilla'" :class="activeTab === 'plantilla' ? 'bg-blue-600 shadow' : 'bg-blue-800 hover:bg-blue-700'" class="px-5 py-2.5 rounded-lg text-sm font-semibold transition">Estadísticas Plantilla</button>
+                    <button @click="activeTab = 'ejercicios'" :class="activeTab === 'ejercicios' ? 'bg-blue-600 shadow' : 'bg-blue-800 hover:bg-blue-700'" class="px-5 py-2.5 rounded-lg text-sm font-semibold transition">Frecuencia de Ejercicios</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Indicador de Carga -->
+        <div x-show="loading" class="flex flex-col justify-center items-center py-32">
+            <div class="animate-spin rounded-full h-14 w-14 border-4 border-blue-900 border-t-transparent"></div>
+            <span class="mt-4 text-lg font-semibold text-blue-900">Sincronizando datos desde Google Sheets...</span>
+        </div>
+
+        <!-- Contenido Principal -->
+        <main x-show="!loading" class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full space-y-6">
+
+            <!-- SECCIÓN 1: ESTADÍSTICAS ACUMULADAS DE LA PLANTILLA -->
+            <div x-show="activeTab === 'plantilla'" class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-blue-950">Resumen Estadístico por Jugador</h2>
+                        <p class="text-sm text-gray-500">Totales acumulados de la temporada actual ordenados por rendimiento.</p>
+                    </div>
+                    <input type="text" x-model="searchJugador" placeholder="Buscar jugador..." class="border border-gray-300 px-4 py-2.5 rounded-lg w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm">
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-blue-50/70">
+                                <tr class="text-left text-xs font-bold text-blue-900 uppercase tracking-wider">
+                                    <th @click="sortJugadores('jugador')" class="px-6 py-4 cursor-pointer hover:bg-blue-100">Jugador ↕</th>
+                                    <th @click="sortJugadores('partidosJugados')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100">Partidos ↕</th>
+                                    <th @click="sortJugadores('titular')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100">Titular ↕</th>
+                                    <th @click="sortJugadores('minutos')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100">Minutos ↕</th>
+                                    <th @click="sortJugadores('goles')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100 text-green-700">Goles ↕</th>
+                                    <th @click="sortJugadores('asistencias')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100">Asistencias ↕</th>
+                                    <th @click="sortJugadores('amarillas')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100 text-yellow-600">Amarillas ↕</th>
+                                    <th @click="sortJugadores('rojas')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100 text-red-600">Rojas ↕</th>
+                                    <th @click="sortJugadores('mediaPuntuacion')" class="px-6 py-4 text-center cursor-pointer hover:bg-blue-100">Media Puntuación ↕</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 text-sm">
+                                <template x-for="row in filteredJugadores" :key="row.jugador">
+                                    <tr class="hover:bg-blue-50/40 transition">
+                                        <td class="px-6 py-4 font-bold text-blue-950 whitespace-nowrap" x-text="row.jugador"></td>
+                                        <td class="px-4 py-4 text-center text-gray-700" x-text="row.partidosJugados"></td>
+                                        <td class="px-4 py-4 text-center text-gray-700" x-text="row.titular"></td>
+                                        <td class="px-4 py-4 text-center font-medium text-gray-800" x-text="row.minutos"></td>
+                                        <td class="px-4 py-4 text-center font-extrabold text-green-600 text-base" x-text="row.goles"></td>
+                                        <td class="px-4 py-4 text-center font-semibold text-blue-800" x-text="row.asistencias"></td>
+                                        <td class="px-4 py-4 text-center font-bold text-yellow-600" x-text="row.amarillas"></td>
+                                        <td class="px-4 py-4 text-center font-bold text-red-600" x-text="row.rojas"></td>
+                                        <td class="px-6 py-4 text-center font-bold text-indigo-700" x-text="row.mediaPuntuacion"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: FRECUENCIA DE EJERCICIOS Y SESIONES -->
+            <div x-show="activeTab === 'ejercicios'" class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-blue-950">Contador de Tareas y Ejercicios</h2>
+                        <p class="text-sm text-gray-500">Veces totales que se ha trabajado cada ejercicio y sus fechas de realización.</p>
+                    </div>
+                    <input type="text" x-model="searchEjercicios" placeholder="Buscar ejercicio..." class="border border-gray-300 px-4 py-2.5 rounded-lg w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <template x-for="item in filteredEjercicios" :key="item.nombre">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-blue-600 flex flex-col justify-between hover:shadow-md transition">
+                            <div>
+                                <div class="flex justify-between items-start gap-2">
+                                    <h3 class="text-base font-bold text-gray-900" x-text="item.nombre"></h3>
+                                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap" x-text="item.fechas.length + ' veces'"></span>
+                                </div>
+                            </div>
+                            <div class="mt-5 pt-3 border-t border-gray-100">
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Días trabajados:</p>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <template x-for="fecha in item.fechas">
+                                        <span class="bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-md font-mono font-medium" x-text="fecha"></span>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function app() {
+            return {
+                loading: true,
+                activeTab: 'plantilla',
+                searchJugador: '',
+                searchEjercicios: '',
+                sortColumn: 'goles',
+                sortAsc: false,
+                jugadores: [],
+                ejerciciosResumen: [],
+
+                async init() {
+                    const API_URL = 'https://script.google.com/macros/s/AKfycbyqm8AOHHvX6-p8UI05EUjp-y3rGAsk8okxWDJjckGBspfUseyvTefbEXTkKu3Et5ObPQ/exec'; // <-- Pega aquí tu URL de Apps Script
+                    try {
+                        let response = await fetch(API_URL);
+                        let data = await response.json();
+                        
+                        // Procesar y agrupar estadísticas por jugador
+                        this.procesarJugadores(data.partidos);
+                        this.ejerciciosResumen = data.ejercicios;
+                    } catch (error) {
+                        console.error("Error al cargar los datos:", error);
+                        alert("No se pudieron cargar los datos del Google Sheet.");
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                procesarJugadores(partidos) {
+                    let map = {};
+                    partidos.forEach(p => {
+                        let nombre = p.jugador ? p.jugador.trim() : "";
+                        if (!nombre) return;
+
+                        if (!map[nombre]) {
+                            map[nombre] = {
+                                jugador: nombre,
+                                partidosJugados: 0,
+                                titular: 0,
+                                suplente: 0,
+                                minutos: 0,
+                                goles: 0,
+                                asistencias: 0,
+                                amarillas: 0,
+                                rojas: 0,
+                                puntuacionSuma: 0,
+                                puntuacionCount: 0
+                            };
+                        }
+
+                        if (p.convocatoria !== 'No convocado') {
+                            map[nombre].partidosJugados++;
+                            if (p.convocatoria === 'Titular') map[nombre].titular++;
+                            if (p.convocatoria === 'Suplente') map[nombre].suplente++;
+                        }
+
+                        map[nombre].minutos += Number(p.minutos) || 0;
+                        map[nombre].goles += Number(p.goles) || 0;
+                        map[nombre].asistencias += Number(p.asistencias) || 0;
+                        map[nombre].amarillas += Number(p.amarillas) || 0;
+                        map[nombre].rojas += Number(p.rojas) || 0;
+
+                        let punt = parseFloat(p.puntuacion);
+                        if (!isNaN(punt) && punt > 0) {
+                            map[nombre].puntuacionSuma += punt;
+                            map[nombre].puntuacionCount++;
+                        }
+                    });
+
+                    this.jugadores = Object.values(map).map(j => {
+                        j.mediaPuntuacion = j.puntuacionCount > 0 ? (j.puntuacionSuma / j.puntuacionCount).toFixed(2) : '-';
+                        return j;
+                    });
+                },
+
+                get filteredJugadores() {
+                    let result = this.jugadores.filter(j => 
+                        j.jugador.toLowerCase().includes(this.searchJugador.toLowerCase())
+                    );
+
+                    result.sort((a, b) => {
+                        let valA = a[this.sortColumn];
+                        let valB = b[this.sortColumn];
+                        
+                        if (typeof valA === 'string') {
+                            return this.sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                        }
+                        return this.sortAsc ? valA - valB : valB - valA;
+                    });
+
+                    return result;
+                },
+
+                sortJugadores(column) {
+                    if (this.sortColumn === column) {
+                        this.sortAsc = !this.sortAsc;
+                    } else {
+                        this.sortColumn = column;
+                        this.sortAsc = false; // Por defecto descendente para estadísticas (goles, minutos, etc.)
+                    }
+                },
+
+                get filteredEjercicios() {
+                    return this.ejerciciosResumen.filter(e => 
+                        e.nombre.toLowerCase().includes(this.searchEjercicios.toLowerCase())
+                    );
+                }
+            }
+        }
+    </script>
+</body>
+</html>
