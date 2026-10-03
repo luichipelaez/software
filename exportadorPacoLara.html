@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - FUENSANTA C.F. 26/27</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        @media print {
+            body { background: white; }
+            no-print, header, .no-print { display: none !important; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900" x-data="app()">
+
+    <div class="min-h-screen flex flex-col">
+        
+        <!-- Header -->
+        <header class="bg-blue-900 text-white shadow-lg no-print">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row justify-between items-center">
+                <h1 class="text-2xl font-extrabold tracking-wide flex items-center gap-2">
+                    ⚽ CONTROL TEMPORADA FUENSANTA C.F. 26/27
+                </h1>
+                <div class="flex flex-wrap gap-2 mt-3 md:mt-0">
+                    <button @click="activeTab = 'plantilla'" :class="activeTab === 'plantilla' ? 'bg-blue-600 shadow' : 'bg-blue-800 hover:bg-blue-700'" class="px-4 py-2 rounded-lg text-sm font-semibold transition">Estadísticas Plantilla</button>
+                    <button @click="activeTab = 'partidos'" :class="activeTab === 'partidos' ? 'bg-blue-600 shadow' : 'bg-blue-800 hover:bg-blue-700'" class="px-4 py-2 rounded-lg text-sm font-semibold transition">Partidos</button>
+                    <button @click="activeTab = 'sesiones'" :class="activeTab === 'sesiones' ? 'bg-blue-600 shadow' : 'bg-blue-800 hover:bg-blue-700'" class="px-4 py-2 rounded-lg text-sm font-semibold transition">Sesiones</button>
+                    <button @click="activeTab = 'ejercicios'" :class="activeTab === 'ejercicios' ? 'bg-blue-600 shadow' : 'bg-blue-800 hover:bg-blue-700'" class="px-4 py-2 rounded-lg text-sm font-semibold transition">Frecuencia de Ejercicios</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Indicador de Carga -->
+        <div x-show="loading" class="flex flex-col justify-center items-center py-32">
+            <div class="animate-spin rounded-full h-14 w-14 border-4 border-blue-900 border-t-transparent"></div>
+            <span class="mt-4 text-lg font-semibold text-blue-900">Sincronizando datos desde Google Sheets...</span>
+        </div>
+
+        <!-- Contenido Principal -->
+        <main x-show="!loading" class="max-w-7xl mx-auto px-6 py-8 flex-grow w-full space-y-6">
+
+            <!-- SECCIÓN 1: ESTADÍSTICAS ACUMULADAS DE LA PLANTILLA -->
+            <div x-show="activeTab === 'plantilla'" class="space-y-6">
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-4 no-print">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-blue-950">Resumen Estadístico por Jugador</h2>
+                            <p class="text-sm text-gray-500">Haz clic en el nombre de cualquier jugador para ver su detalle por partido.</p>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <button @click="exportToExcel()" class="bg-green-700 hover:bg-green-800 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-1.5">
+                                📊 Exportar Excel
+                            </button>
+                            <button @click="exportToPDF()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow transition flex items-center gap-1.5">
+                                📄 Exportar PDF
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-gray-500">Competiciones:</span>
+                            <template x-for="comp in availableCompetitions" :key="comp">
+                                <label class="inline-flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-lg text-sm cursor-pointer hover:bg-gray-200 transition">
+                                    <input type="checkbox" x-model="selectedCompetitions" :value="comp" @change="procesarJugadores()" class="rounded text-blue-600 focus:ring-blue-500">
+                                    <span class="font-medium text-gray-800" x-text="comp"></span>
+                                </label>
+                            </template>
+                        </div>
+
+                        <input type="text" x-model="searchJugador" placeholder="Buscar jugador..." class="border border-gray-300 px-4 py-2 rounded-lg w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm">
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200" id="statsTable">
+                            <thead class="bg-blue-50/70">
+                                <tr class="text-left text-xs font-bold text-blue-900 uppercase tracking-wider">
+                                    <th @click="sortJugadores('jugador')" class="px-6 py-4 cursor-pointer hover:bg-blue-100">Jugador ↕</th>
+                                    <th @click="sortJugadores('partidosJugados')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100">Partidos ↕</th>
+                                    <th @click="sortJugadores('titular')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100">Titular ↕</th>
+                                    <th @click="sortJugadores('minutos')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100">Minutos ↕</th>
+                                    <th @click="sortJugadores('goles')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100 text-green-700">Goles ↕</th>
+                                    <th @click="sortJugadores('asistencias')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100">Asistencias ↕</th>
+                                    <th @click="sortJugadores('amarillas')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100 text-yellow-600">Amarillas ↕</th>
+                                    <th @click="sortJugadores('rojas')" class="px-4 py-4 text-center cursor-pointer hover:bg-blue-100 text-red-600">Rojas ↕</th>
+                                    <th @click="sortJugadores('mediaPuntuacion')" class="px-6 py-4 text-center cursor-pointer hover:bg-blue-100">Media Puntuación ↕</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 text-sm">
+                                <template x-for="row in filteredJugadores" :key="row.jugador">
+                                    <tr class="hover:bg-blue-50/40 transition">
+                                        <td class="px-6 py-4 font-bold text-blue-900 whitespace-nowrap">
+                                            <button @click="abrirDetalleJugador(row.jugador)" class="hover:underline hover:text-blue-600 text-left flex items-center gap-1.5">
+                                                <span x-text="row.jugador"></span>
+                                                <span class="text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">Ver +</span>
+                                            </button>
+                                        </td>
+                                        <td class="px-4 py-4 text-center text-gray-700" x-text="row.partidosJugados"></td>
+                                        <td class="px-4 py-4 text-center text-gray-700" x-text="row.titular"></td>
+                                        <td class="px-4 py-4 text-center font-medium text-gray-800" x-text="row.minutos"></td>
+                                        <td class="px-4 py-4 text-center font-extrabold text-green-600 text-base" x-text="row.goles"></td>
+                                        <td class="px-4 py-4 text-center font-semibold text-blue-800" x-text="row.asistencias"></td>
+                                        <td class="px-4 py-4 text-center font-bold text-yellow-600" x-text="row.amarillas"></td>
+                                        <td class="px-4 py-4 text-center font-bold text-red-600" x-text="row.rojas"></td>
+                                        <td class="px-6 py-4 text-center font-bold text-indigo-700" x-text="row.mediaPuntuacion"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN PARTIDOS -->
+            <div x-show="activeTab === 'partidos'" class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-4">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-blue-950">Calendario y Resultados de Partidos</h2>
+                            <p class="text-sm text-gray-500">Selecciona cualquier partido para ver su ficha técnica detallada (titulares y suplentes).</p>
+                        </div>
+                        <input type="text" x-model="searchPartidoRival" placeholder="Buscar por rival..." class="border border-gray-300 px-4 py-2.5 rounded-lg w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm">
+                    </div>
+
+                    <div class="pt-4 border-t border-gray-100 flex flex-wrap items-center gap-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-gray-500">Filtrar competición:</span>
+                        <template x-for="comp in availableCompetitions" :key="'p-' + comp">
+                            <label class="inline-flex items-center gap-1.5 bg-gray-100 px-3 py-1.5 rounded-lg text-sm cursor-pointer hover:bg-gray-200 transition">
+                                <input type="checkbox" x-model="selectedCompetitionsPartidos" :value="comp" class="rounded text-blue-600 focus:ring-blue-500">
+                                <span class="font-medium text-gray-800" x-text="comp"></span>
+                            </label>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-blue-50/70">
+                                <tr class="text-left text-xs font-bold text-blue-900 uppercase tracking-wider">
+                                    <th class="px-6 py-4">Fecha</th>
+                                    <th class="px-6 py-4">Competición</th>
+                                    <th class="px-6 py-4">Rival</th>
+                                    <th class="px-6 py-4 text-center">Resultado</th>
+                                    <th class="px-6 py-4 text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                <template x-for="partidoUnico in listaPartidosUnicosFiltrados" :key="partidoUnico.idUnico">
+                                    <tr class="hover:bg-blue-50/40 transition cursor-pointer" @click="abrirFichaPartido(partidoUnico)">
+                                        <td class="px-6 py-4 font-mono text-xs text-gray-600" x-text="partidoUnico.fecha"></td>
+                                        <td class="px-6 py-4">
+                                            <span class="bg-blue-100 text-blue-800 text-xs px-2.5 py-1 rounded-md font-semibold" x-text="partidoUnico.competicion"></span>
+                                        </td>
+                                        <td class="px-6 py-4 font-extrabold text-blue-950 text-base" x-text="'vs ' + partidoUnico.rival"></td>
+                                        <td class="px-6 py-4 text-center">
+                                            <span class="inline-block px-3.5 py-1.5 rounded-lg text-base font-black shadow-sm border"
+                                                :class="{
+                                                    'bg-green-100 text-green-900 border-green-300': partidoUnico.estadoResultado === 'G',
+                                                    'bg-amber-100 text-amber-900 border-amber-300': partidoUnico.estadoResultado === 'E',
+                                                    'bg-red-100 text-red-900 border-red-300': partidoUnico.estadoResultado === 'P',
+                                                    'bg-gray-100 text-gray-800 border-gray-300': partidoUnico.estadoResultado === 'N'
+                                                }">
+                                                <span :class="partidoUnico.esLocal ? 'text-green-700 font-extrabold' : 'text-gray-800'" x-text="partidoUnico.golesL"></span>
+                                                <span class="mx-1 text-gray-400">-</span>
+                                                <span :class="!partidoUnico.esLocal ? 'text-green-700 font-extrabold' : 'text-gray-800'" x-text="partidoUnico.golesV"></span>
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            <button class="bg-blue-900 hover:bg-blue-800 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold shadow transition">
+                                                Ver Ficha 📋
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: SESIONES DE ENTRENAMIENTO -->
+            <div x-show="activeTab === 'sesiones'" class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-blue-950">Historial de Sesiones de Entrenamiento</h2>
+                        <p class="text-sm text-gray-500">Ordenadas cronológicamente. Haz clic en cualquier sesión para ver su detalle completo y tareas.</p>
+                    </div>
+                    <input type="text" x-model="searchSesiones" placeholder="Buscar sesión o fecha..." class="border border-gray-300 px-4 py-2.5 rounded-lg w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <template x-for="sesion in listaSesionesFiltradas" :key="sesion.id">
+                        <div @click="abrirDetalleSesion(sesion)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-blue-900 flex flex-col justify-between hover:shadow-lg transition cursor-pointer">
+                            <div>
+                                <div class="flex justify-between items-start gap-2 mb-2">
+                                    <span class="bg-blue-50 text-blue-900 text-xs font-mono font-bold px-2.5 py-1 rounded" x-text="sesion.fecha"></span>
+                                    <span class="bg-gray-100 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-full" x-text="sesion.tareas.length + ' tareas'"></span>
+                                </div>
+                                <h3 class="text-base font-bold text-blue-950" x-text="sesion.titulo"></h3>
+                                <p class="text-xs text-gray-600 mt-1 line-clamp-2" x-text="sesion.objetivo || 'Sin objetivo especificado'"></p>
+                            </div>
+                            <div class="mt-5 pt-3 border-t border-gray-100">
+                                <span class="text-xs font-semibold text-blue-700 hover:underline flex items-center gap-1">
+                                    Ver Ficha de Sesión 📋
+                                </span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- SECCIÓN 2: FRECUENCIA DE EJERCICIOS Y TAREAS -->
+            <div x-show="activeTab === 'ejercicios'" class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-blue-950">Contador de Tareas y Ejercicios</h2>
+                        <p class="text-sm text-gray-500">Ordenados de mayor a menor frecuencia de uso. Haz clic en cualquier tarea para ver su ficha completa.</p>
+                    </div>
+                    <input type="text" x-model="searchEjercicios" placeholder="Buscar ejercicio..." class="border border-gray-300 px-4 py-2.5 rounded-lg w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <template x-for="item in filteredEjercicios" :key="item.nombre">
+                        <div @click="abrirDetalleTarea(item)" class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-blue-600 flex flex-col justify-between hover:shadow-lg transition cursor-pointer">
+                            <div>
+                                <div class="flex justify-between items-start gap-2">
+                                    <h3 class="text-base font-bold text-gray-900" x-text="item.nombre"></h3>
+                                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap" x-text="item.fechas.length + ' veces'"></span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2 line-clamp-2" x-text="item.descripcion || 'Sin descripción disponible'"></p>
+                            </div>
+                            <div class="mt-5 pt-3 border-t border-gray-100">
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Días trabajados:</p>
+                                <div class="flex flex-wrap gap-1.5">
+                                    <template x-for="fecha in item.fechas">
+                                        <span class="bg-gray-100 text-gray-700 text-xs px-2.5 py-1 rounded-md font-mono font-medium" x-text="fecha"></span>
+                                    </template>
+                                    <span x-show="item.fechas.length === 0" class="text-xs text-gray-400 italic">No realizada aún</span>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL DE DETALLE DE JUGADOR -->
+    <div x-show="showModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden" @click.away="showModal = false">
+            
+            <div class="bg-blue-900 text-white px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold" x-text="'Estadísticas detalladas: ' + selectedJugadorName"></h3>
+                    <p class="text-xs text-blue-200">Desglose de rendimiento según las competiciones seleccionadas</p>
+                </div>
+                <button @click="showModal = false" class="bg-blue-800 hover:bg-blue-700 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6 flex-grow">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-center">
+                        <span class="text-xs font-bold text-blue-600 uppercase">Partidos / Titular</span>
+                        <p class="text-xl font-extrabold text-blue-950 mt-1" x-text="getSelectedJugadorSummary().partidosJugados + ' (' + getSelectedJugadorSummary().titular + ' tit.)'"></p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-xl border border-green-100 text-center">
+                        <span class="text-xs font-bold text-green-600 uppercase">Goles / Asistencias</span>
+                        <p class="text-xl font-extrabold text-green-800 mt-1" x-text="getSelectedJugadorSummary().goles + ' ⚽ / ' + getSelectedJugadorSummary().asistencias + ' 🎯'"></p>
+                    </div>
+                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-center">
+                        <span class="text-xs font-bold text-indigo-600 uppercase">Minutos Jugados</span>
+                        <p class="text-xl font-extrabold text-indigo-900 mt-1" x-text="getSelectedJugadorSummary().minutos + '\''"></p>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-100 text-center">
+                        <span class="text-xs font-bold text-yellow-600 uppercase">Tarjetas (Amarilla / Roja)</span>
+                        <p class="text-xl font-extrabold text-yellow-800 mt-1" x-text="getSelectedJugadorSummary().amarillas + ' 🟨 / ' + getSelectedJugadorSummary().rojas + ' 🟥'"></p>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-3">Historial de Partidos</h4>
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-100">
+                                <tr class="text-left text-xs font-semibold text-gray-600 uppercase">
+                                    <th class="px-4 py-3">Fecha</th>
+                                    <th class="px-4 py-3">Rival</th>
+                                    <th class="px-4 py-3">Competición</th>
+                                    <th class="px-4 py-3 text-center">Estado</th>
+                                    <th class="px-4 py-3 text-center">Minutos</th>
+                                    <th class="px-4 py-3 text-center">Goles</th>
+                                    <th class="px-4 py-3 text-center">Asist.</th>
+                                    <th class="px-4 py-3 text-center">Tarjetas</th>
+                                    <th class="px-4 py-3 text-center">Puntuación</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                <template x-for="p in getPartidosJugador(selectedJugadorName)" :key="p.id">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3 font-mono text-xs text-gray-600" x-text="p.fecha"></td>
+                                        <td class="px-4 py-3 font-bold text-gray-900" x-text="p.rival"></td>
+                                        <td class="px-4 py-3"><span class="bg-gray-100 text-gray-700 text-xs px-2 py-0.5 rounded font-medium" x-text="p.competicion"></span></td>
+                                        <td class="px-4 py-3 text-center">
+                                            <span class="text-xs font-semibold px-2 py-0.5 rounded" :class="p.convocatoria === 'Titular' ? 'bg-green-100 text-green-800' : (p.convocatoria === 'Suplente' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800')" x-text="p.convocatoria"></span>
+                                        </td>
+                                        <td class="px-4 py-3 text-center font-medium" x-text="p.minutos"></td>
+                                        <td class="px-4 py-3 text-center font-bold text-green-600" x-text="p.goles"></td>
+                                        <td class="px-4 py-3 text-center text-blue-700" x-text="p.asistencias"></td>
+                                        <td class="px-4 py-3 text-center font-bold">
+                                            <span class="text-yellow-600" x-text="(Number(p.amarillas) || 0) > 0 ? (Number(p.amarillas) || 0) + '🟨' : ''"></span>
+                                            <span class="text-red-600 ml-1" x-text="(Number(p.rojas) || 0) > 0 ? (Number(p.rojas) || 0) + '🟥' : ''"></span>
+                                        </td>
+                                        <td class="px-4 py-3 text-center font-bold text-indigo-700" x-text="Number(p.puntuacion) > 0 ? p.puntuacion : '-'"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex justify-end">
+                <button @click="showModal = false" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE FICHA DE PARTIDO -->
+    <div x-show="showPartidoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden" @click.away="showPartidoModal = false">
+            
+            <div class="bg-blue-950 text-white px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-extrabold" x-text="'Ficha del Partido: vs ' + selectedPartidoRival"></h3>
+                    <p class="text-xs text-blue-200" x-text="selectedPartidoFecha + ' • ' + selectedPartidoCompeticion"></p>
+                </div>
+                <button @click="showPartidoModal = false" class="bg-blue-900 hover:bg-blue-800 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6 flex-grow">
+                <div>
+                    <h4 class="text-xs font-bold text-green-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">🟢 Jugadores Titulares</h4>
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-100">
+                                <tr class="text-left text-xs font-semibold text-gray-600 uppercase">
+                                    <th class="px-4 py-3">Jugador</th>
+                                    <th class="px-4 py-3 text-center">Minutos</th>
+                                    <th class="px-4 py-3 text-center">Goles</th>
+                                    <th class="px-4 py-3 text-center">Asist.</th>
+                                    <th class="px-4 py-3 text-center">Tarjetas</th>
+                                    <th class="px-4 py-3 text-center">Puntuación</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                <template x-for="p in getJugadoresPartidoPorConvocatoria('Titular')" :key="p.id">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3 font-bold text-gray-900" x-text="p.jugador"></td>
+                                        <td class="px-4 py-3 text-center font-medium" x-text="p.minutos"></td>
+                                        <td class="px-4 py-3 text-center font-bold text-green-600" x-text="p.goles"></td>
+                                        <td class="px-4 py-3 text-center text-blue-700" x-text="p.asistencias"></td>
+                                        <td class="px-4 py-3 text-center font-bold">
+                                            <span class="text-yellow-600" x-text="(Number(p.amarillas) || 0) > 0 ? (Number(p.amarillas) || 0) + '🟨' : ''"></span>
+                                            <span class="text-red-600 ml-1" x-text="(Number(p.rojas) || 0) > 0 ? (Number(p.rojas) || 0) + '🟥' : ''"></span>
+                                        </td>
+                                        <td class="px-4 py-3 text-center font-bold text-indigo-700" x-text="Number(p.puntuacion) > 0 ? p.puntuacion : '-'"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold text-yellow-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">🟡 Jugadores Suplentes</h4>
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-100">
+                                <tr class="text-left text-xs font-semibold text-gray-600 uppercase">
+                                    <th class="px-4 py-3">Jugador</th>
+                                    <th class="px-4 py-3 text-center">Minutos</th>
+                                    <th class="px-4 py-3 text-center">Goles</th>
+                                    <th class="px-4 py-3 text-center">Asist.</th>
+                                    <th class="px-4 py-3 text-center">Tarjetas</th>
+                                    <th class="px-4 py-3 text-center">Puntuación</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white">
+                                <template x-for="p in getJugadoresPartidoPorConvocatoria('Suplente')" :key="p.id">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3 font-bold text-gray-900" x-text="p.jugador"></td>
+                                        <td class="px-4 py-3 text-center font-medium" x-text="p.minutos"></td>
+                                        <td class="px-4 py-3 text-center font-bold text-green-600" x-text="p.goles"></td>
+                                        <td class="px-4 py-3 text-center text-blue-700" x-text="p.asistencias"></td>
+                                        <td class="px-4 py-3 text-center font-bold">
+                                            <span class="text-yellow-600" x-text="(Number(p.amarillas) || 0) > 0 ? (Number(p.amarillas) || 0) + '🟨' : ''"></span>
+                                            <span class="text-red-600 ml-1" x-text="(Number(p.rojas) || 0) > 0 ? (Number(p.rojas) || 0) + '🟥' : ''"></span>
+                                        </td>
+                                        <td class="px-4 py-3 text-center font-bold text-indigo-700" x-text="Number(p.puntuacion) > 0 ? p.puntuacion : '-'"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex justify-end">
+                <button @click="showPartidoModal = false" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE DETALLE DE SESIÓN COMPLETA -->
+    <div x-show="showSesionModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden" @click.away="showSesionModal = false">
+            
+            <div class="bg-blue-900 text-white px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold" x-text="selectedSesion.titulo"></h3>
+                    <p class="text-xs text-blue-200" x-text="'Fecha: ' + selectedSesion.fecha"></p>
+                </div>
+                <button @click="showSesionModal = false" class="bg-blue-800 hover:bg-blue-700 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6 flex-grow">
+                <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                    <span class="text-xs font-bold text-blue-700 uppercase">Objetivo de la Sesión</span>
+                    <p class="text-sm font-semibold text-gray-800 mt-1" x-text="selectedSesion.objetivo || 'Sin objetivo detallado'"></p>
+                </div>
+
+                <div>
+                    <h4 class="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">Tareas y Bloques de la Sesión</h4>
+                    <div class="space-y-6">
+                        <template x-for="(tarea, index) in selectedSesion.tareas" :key="index">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-5 space-y-4">
+                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-gray-100 pb-3">
+                                    <div>
+                                        <span class="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded mr-2" x-text="'Bloque ' + (index + 1)"></span>
+                                        <h5 class="text-base font-extrabold text-blue-950 inline-block" x-text="tarea.nombre"></h5>
+                                    </div>
+                                    <span class="text-xs font-mono font-bold bg-gray-100 text-gray-700 px-2.5 py-1 rounded" x-text="tarea.tiempo ? tarea.tiempo + ' Min' : 'Tiempo no especificado'"></span>
+                                </div>
+
+                                <!-- Imagen de la Tarea si existe -->
+                                <div x-show="tarea.imagen" class="bg-gray-50 p-3 rounded-lg border border-gray-100 text-center">
+                                    <img :src="tarea.imagen" alt="Imagen del ejercicio" class="max-h-60 mx-auto rounded-lg object-contain">
+                                </div>
+
+                                <!-- Observaciones / Explicación -->
+                                <div x-show="tarea.observaciones">
+                                    <span class="text-xs font-bold text-gray-500 uppercase">Observaciones / Desarrollo</span>
+                                    <p class="text-sm text-gray-800 bg-gray-50 p-3 rounded-lg border border-gray-100 whitespace-pre-line mt-1" x-text="tarea.observaciones"></p>
+                                </div>
+
+                                <!-- Detalles adicionales -->
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs pt-2">
+                                    <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
+                                        <span class="font-bold text-gray-500 block">Tipo:</span>
+                                        <span class="font-semibold text-gray-800" x-text="tarea.tipoTarea || '-' "></span>
+                                    </div>
+                                    <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
+                                        <span class="font-bold text-gray-500 block">Objetivo Princ.:</span>
+                                        <span class="font-semibold text-gray-800" x-text="tarea.objetivoPrinc || '-' "></span>
+                                    </div>
+                                    <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
+                                        <span class="font-bold text-gray-500 block">Espacio:</span>
+                                        <span class="font-semibold text-gray-800" x-text="tarea.espacio || '-' "></span>
+                                    </div>
+                                    <div class="bg-gray-50 p-2.5 rounded border border-gray-100">
+                                        <span class="font-bold text-gray-500 block">Fases:</span>
+                                        <span class="font-semibold text-gray-800" x-text="tarea.fases || '-' "></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex justify-end">
+                <button @click="showSesionModal = false" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE DETALLE DE TAREA / EJERCICIO -->
+    <div x-show="showTareaModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 overflow-y-auto" style="display: none;">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col overflow-hidden" @click.away="showTareaModal = false">
+            
+            <div class="bg-blue-950 text-white px-6 py-4 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold" x-text="selectedTarea.nombre"></h3>
+                    <p class="text-xs text-blue-200" x-text="'Veces realizada: ' + (selectedTarea.fechas ? selectedTarea.fechas.length : 0)"></p>
+                </div>
+                <button @click="showTareaModal = false" class="bg-blue-900 hover:bg-blue-800 text-white font-bold w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6 flex-grow">
+                <div x-show="selectedTarea.imagen" class="bg-gray-100 p-3 rounded-xl border border-gray-200 text-center">
+                    <img :src="selectedTarea.imagen" alt="Ilustración del ejercicio" class="max-h-72 mx-auto rounded-lg object-contain">
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Descripción</h4>
+                    <p class="text-sm text-gray-800 bg-gray-50 p-3 rounded-lg border border-gray-100 whitespace-pre-line" x-text="selectedTarea.descripcion || 'Sin descripción disponible.'"></p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                        <span class="text-xs font-bold text-blue-700 uppercase">Tipo de Tarea</span>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="selectedTarea.tipoTarea || '-'"></p>
+                    </div>
+                    <div class="bg-green-50/50 p-3 rounded-lg border border-green-100">
+                        <span class="text-xs font-bold text-green-700 uppercase">Objetivo Principal</span>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="selectedTarea.objetivoPrinc || '-'"></p>
+                    </div>
+                    <div class="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100">
+                        <span class="text-xs font-bold text-indigo-700 uppercase">Objetivo Secundario</span>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="selectedTarea.objetivoSec || '-'"></p>
+                    </div>
+                    <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-100">
+                        <span class="text-xs font-bold text-amber-700 uppercase">Espacio</span>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="selectedTarea.espacio || '-'"></p>
+                    </div>
+                    <div class="bg-purple-50/50 p-3 rounded-lg border border-purple-100">
+                        <span class="text-xs font-bold text-purple-700 uppercase">Fases</span>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="selectedTarea.fases || '-'"></p>
+                    </div>
+                    <div class="bg-gray-100 p-3 rounded-lg border border-gray-200">
+                        <span class="text-xs font-bold text-gray-600 uppercase">Jugadores / Otros</span>
+                        <p class="font-semibold text-gray-800 mt-0.5" x-text="(selectedTarea.jugadores || '') + (selectedTarea.otros ? ' / ' + selectedTarea.otros : '') || '-'"></p>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Fechas de Realización</h4>
+                    <div class="flex flex-wrap gap-2">
+                        <template x-for="fecha in selectedTarea.fechas">
+                            <span class="bg-blue-100 text-blue-900 text-xs px-3 py-1 rounded-md font-mono font-bold" x-text="fecha"></span>
+                        </template>
+                        <span x-show="!selectedTarea.fechas || selectedTarea.fechas.length === 0" class="text-sm text-gray-500 italic">No se ha registrado en ninguna sesión todavía.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-3 border-t border-gray-200 flex justify-end">
+                <button @click="showTareaModal = false" class="bg-gray-800 hover:bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function app() {
+            return {
+                loading: true,
+                activeTab: 'plantilla',
+                searchJugador: '',
+                searchEjercicios: '',
+                searchSesiones: '',
+                searchPartidoRival: '',
+                sortColumn: 'goles',
+                sortAsc: false,
+                rawPartidos: [],
+                jugadores: [],
+                sesionesResumen: [],
+                ejerciciosResumen: [],
+                availableCompetitions: [],
+                selectedCompetitions: [],
+                selectedCompetitionsPartidos: [],
+                
+                // Modales
+                showModal: false,
+                selectedJugadorName: '',
+                showPartidoModal: false,
+                selectedPartidoFecha: '',
+                selectedPartidoRival: '',
+                selectedPartidoCompeticion: '',
+                showSesionModal: false,
+                selectedSesion: { tareas: [] },
+                showTareaModal: false,
+                selectedTarea: {},
+
+                async init() {
+                    const API_URL = 'https://script.google.com/macros/s/AKfycbzwH0OP_WCQWLvMkgeKSiKxkWsLK82SJV6k2WwWiD_qze1shPD_eIWvkGkbDx0wu4VJ/exec';
+                    try {
+                        let response = await fetch(API_URL);
+                        let data = await response.json();
+                        
+                        this.rawPartidos = data.partidos;
+                        
+                        let comps = new Set();
+                        this.rawPartidos.forEach(p => {
+                            if (p.competicion) comps.add(p.competicion.trim());
+                        });
+                        this.availableCompetitions = Array.from(comps);
+                        this.selectedCompetitions = [...this.availableCompetitions];
+                        this.selectedCompetitionsPartidos = [...this.availableCompetitions];
+
+                        this.procesarJugadores();
+                        this.sesionesResumen = data.sesiones || [];
+                        this.ejerciciosResumen = data.ejercicios || [];
+                    } catch (error) {
+                        console.error("Error al cargar los datos:", error);
+                        alert("No se pudieron cargar los datos del Google Sheet.");
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
+                procesarJugadores() {
+                    let map = {};
+                    
+                    let partidosFiltrados = this.rawPartidos.filter(p => {
+                        let comp = p.competicion ? p.competicion.trim() : '';
+                        return this.selectedCompetitions.includes(comp);
+                    });
+
+                    partidosFiltrados.forEach(p => {
+                        let nombre = p.jugador ? p.jugador.trim() : "";
+                        if (!nombre) return;
+
+                        if (!map[nombre]) {
+                            map[nombre] = {
+                                jugador: nombre,
+                                partidosJugados: 0,
+                                titular: 0,
+                                suplente: 0,
+                                minutos: 0,
+                                goles: 0,
+                                asistencias: 0,
+                                amarillas: 0,
+                                rojas: 0,
+                                puntuacionSuma: 0,
+                                puntuacionCount: 0
+                            };
+                        }
+
+                        if (p.convocatoria !== 'No convocado') {
+                            map[nombre].partidosJugados++;
+                            if (p.convocatoria === 'Titular') map[nombre].titular++;
+                            if (p.convocatoria === 'Suplente') map[nombre].suplente++;
+                        }
+
+                        map[nombre].minutos += Number(p.minutos) || 0;
+                        map[nombre].goles += Number(p.goles) || 0;
+                        map[nombre].asistencias += Number(p.asistencias) || 0;
+                        map[nombre].amarillas += Number(p.amarillas) || 0;
+                        map[nombre].rojas += Number(p.rojas) || 0;
+
+                        let punt = parseFloat(p.puntuacion);
+                        if (!isNaN(punt) && punt > 0) {
+                            map[nombre].puntuacionSuma += punt;
+                            map[nombre].puntuacionCount++;
+                        }
+                    });
+
+                    this.jugadores = Object.values(map).map(j => {
+                        j.mediaPuntuacion = j.puntuacionCount > 0 ? (j.puntuacionSuma / j.puntuacionCount).toFixed(2) : '-';
+                        return j;
+                    });
+                },
+
+                abrirDetalleJugador(nombre) {
+                    this.selectedJugadorName = nombre;
+                    this.showModal = true;
+                },
+
+                abrirDetalleTarea(item) {
+                    this.selectedTarea = item;
+                    this.showTareaModal = true;
+                },
+
+                abrirDetalleSesion(sesion) {
+                    this.selectedSesion = sesion;
+                    this.showSesionModal = true;
+                },
+
+                getPartidosJugador(nombre) {
+                    return this.rawPartidos.filter(p => {
+                        let comp = p.competicion ? p.competicion.trim() : '';
+                        let jugadorPartido = p.jugador ? p.jugador.trim() : '';
+                        return jugadorPartido === nombre && this.selectedCompetitions.includes(comp);
+                    });
+                },
+
+                getSelectedJugadorSummary() {
+                    let partidos = this.getPartidosJugador(this.selectedJugadorName);
+                    let resumen = { partidosJugados: 0, titular: 0, minutos: 0, goles: 0, asistencias: 0, amarillas: 0, rojas: 0 };
+                    
+                    partidos.forEach(p => {
+                        if (p.convocatoria !== 'No convocado') {
+                            resumen.partidosJugados++;
+                            if (p.convocatoria === 'Titular') resumen.titular++;
+                        }
+                        resumen.minutos += Number(p.minutos) || 0;
+                        resumen.goles += Number(p.goles) || 0;
+                        resumen.asistencias += Number(p.asistencias) || 0;
+                        resumen.amarillas += Number(p.amarillas) || 0;
+                        resumen.rojas += Number(p.rojas) || 0;
+                    });
+                    return resumen;
+                },
+
+                get listaPartidosUnicosFiltrados() {
+                    let mapPartidos = {};
+                    this.rawPartidos.forEach(p => {
+                        let fecha = p.fecha ? p.fecha.trim() : '';
+                        let rival = p.rival ? p.rival.trim() : '';
+                        let comp = p.competicion ? p.competicion.trim() : '';
+                        let res = p.resultado ? p.resultado.trim() : '';
+                        let condicion = (p.condicion || p.localVisitante || p.ubicacion || p.campo || 'local').toString().toLowerCase();
+                        
+                        let idUnico = fecha + "_" + rival;
+                        if (!mapPartidos[idUnico]) {
+                            let partesGoles = res.split('-');
+                            let gL = partesGoles[0] ? partesGoles[0].trim() : '0';
+                            let gV = partesGoles[1] ? partesGoles[1].trim() : '0';
+                            let numGL = parseInt(gL) || 0;
+                            let numGV = parseInt(gV) || 0;
+
+                            let esLocal = !condicion.includes('visitante') && !condicion.startsWith('v');
+
+                            let golesEquipo = esLocal ? numGL : numGV;
+                            let golesRival = esLocal ? numGV : numGL;
+
+                            let estadoResultado = 'N'; 
+                            if (res.includes('-')) {
+                                if (golesEquipo > golesRival) estadoResultado = 'G';      
+                                else if (golesEquipo < golesRival) estadoResultado = 'P'; 
+                                else estadoResultado = 'E';                              
+                            }
+
+                            mapPartidos[idUnico] = {
+                                idUnico: idUnico,
+                                fecha: fecha,
+                                rival: rival,
+                                competicion: comp,
+                                resultado: res,
+                                golesL: gL,
+                                golesV: gV,
+                                esLocal: esLocal,
+                                estadoResultado: estadoResultado
+                            };
+                        }
+                    });
+
+                    let lista = Object.values(mapPartidos);
+                    lista = lista.filter(item => this.selectedCompetitionsPartidos.includes(item.competicion));
+
+                    if (this.searchPartidoRival) {
+                        lista = lista.filter(item => item.rival.toLowerCase().includes(this.searchPartidoRival.toLowerCase()));
+                    }
+                    return lista;
+                },
+
+                abrirFichaPartido(partido) {
+                    this.selectedPartidoFecha = partido.fecha;
+                    this.selectedPartidoRival = partido.rival;
+                    this.selectedPartidoCompeticion = partido.competicion;
+                    this.showPartidoModal = true;
+                },
+
+                getJugadoresPartidoPorConvocatoria(tipoConvocatoria) {
+                    return this.rawPartidos.filter(p => {
+                        let fecha = p.fecha ? p.fecha.trim() : '';
+                        let rival = p.rival ? p.rival.trim() : '';
+                        return fecha === this.selectedPartidoFecha && rival === this.selectedPartidoRival && p.convocatoria === tipoConvocatoria;
+                    });
+                },
+
+                get filteredJugadores() {
+                    let result = this.jugadores.filter(j => 
+                        j.jugador.toLowerCase().includes(this.searchJugador.toLowerCase())
+                    );
+
+                    result.sort((a, b) => {
+                        let valA = a[this.sortColumn];
+                        let valB = b[this.sortColumn];
+                        
+                        if (typeof valA === 'string') {
+                            return this.sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+                        }
+                        return this.sortAsc ? valA - valB : valB - valA;
+                    });
+
+                    return result;
+                },
+
+                sortJugadores(column) {
+                    if (this.sortColumn === column) {
+                        this.sortAsc = !this.sortAsc;
+                    } else {
+                        this.sortColumn = column;
+                        this.sortAsc = false;
+                    }
+                },
+
+                get listaSesionesFiltradas() {
+                    let lista = [...this.sesionesResumen];
+                    // Ordenar cronológicamente por fecha (DD/MM/YYYY)
+                    lista.sort((a, b) => {
+                        let pA = a.fecha.split('/');
+                        let pB = b.fecha.split('/');
+                        let fA = new Date(pA[2], pA[1] - 1, pA[0]);
+                        let fB = new Date(pB[2], pB[1] - 1, pB[0]);
+                        return fA - fB;
+                    });
+
+                    if (this.searchSesiones) {
+                        lista = lista.filter(s => 
+                            s.titulo.toLowerCase().includes(this.searchSesiones.toLowerCase()) ||
+                            s.objetivo.toLowerCase().includes(this.searchSesiones.toLowerCase()) ||
+                            s.fecha.includes(this.searchSesiones)
+                        );
+                    }
+                    return lista;
+                },
+
+                get filteredEjercicios() {
+                    let resultado = this.ejerciciosResumen.filter(e => 
+                        e.nombre.toLowerCase().includes(this.searchEjercicios.toLowerCase())
+                    );
+                    resultado.sort((a, b) => b.fechas.length - a.fechas.length);
+                    return resultado;
+                },
+
+                exportToExcel() {
+                    let csvContent = "\ufeff";
+                    let headers = ["Jugador", "Partidos", "Titular", "Minutos", "Goles", "Asistencias", "Amarillas", "Rojas", "Media Puntuacion"];
+                    csvContent += headers.join(";") + "\r\n";
+                    
+                    this.filteredJugadores.forEach(row => {
+                        let rowData = [
+                            `"${row.jugador}"`,
+                            row.partidosJugados,
+                            row.titular,
+                            row.minutos,
+                            row.goles,
+                            row.asistencias,
+                            row.amarillas,
+                            row.rojas,
+                            row.mediaPuntuacion
+                        ];
+                        csvContent += rowData.join(";") + "\r\n";
+                    });
+
+                    let blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    let link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.setAttribute("download", "estadisticas_plantilla_lopera.csv");
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                },
+
+                exportToPDF() {
+                    window.print();
+                }
+            }
+        }
+    </script>
+</body>
+</html>
