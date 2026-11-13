@@ -115,7 +115,8 @@ h1{font-family:'Orbitron','Segoe UI',Arial,sans-serif;font-weight:900;font-size:
 .video-modal.open{display:flex}
 .video-container{width:100%;max-width:900px;aspect-ratio:16/9;background:#000;border:2px solid var(--c-video);box-shadow:0 0 30px var(--c-video);border-radius:10px;overflow:hidden}
 .video-container iframe{width:100%;height:100%;border:0}
-.close-video-btn{margin-top:20px;padding:10px 30px;background:var(--c-video);color:#fff;border:none;border-radius:5px;font-size:1.1rem;cursor:pointer;font-weight:700}
+.yt-fallback{margin-top:14px;color:#fff;opacity:.8;font-size:.9rem}
+.close-video-btn{margin-top:14px;padding:10px 30px;background:var(--c-video);color:#fff;border:none;border-radius:5px;font-size:1.1rem;cursor:pointer;font-weight:700}
 
 @media (max-width:900px){
   body{padding-left:8px;padding-right:8px}
@@ -154,6 +155,7 @@ h1{font-family:'Orbitron','Segoe UI',Arial,sans-serif;font-weight:900;font-size:
 
 <div class="video-modal" id="video-modal" role="dialog" aria-modal="true" aria-label="Reproductor de vídeo">
   <div class="video-container" id="video-container"></div>
+  <a class="yt-fallback" id="yt-enlace" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">¿No se ve? Abrir en YouTube</a>
   <button class="close-video-btn" id="cerrar-video" type="button">CERRAR VÍDEO</button>
 </div>
 
@@ -161,8 +163,8 @@ h1{font-family:'Orbitron','Segoe UI',Arial,sans-serif;font-weight:900;font-size:
 /* ===================== CONFIGURACIÓN ===================== */
 /* Rellena tus datos de contacto. Deja "" para ocultar un botón. */
 const CONTACTO = {
-  whatsapp: "34699719971",          // número con prefijo, sin + ni espacios
-  email: "luichipelaez@gmail.com",
+  whatsapp: "34600000000",          // número con prefijo, sin + ni espacios
+  email: "tucorreo@ejemplo.com",
   mixcloud: "https://www.mixcloud.com/DJLuichi/"
 };
 
@@ -178,10 +180,10 @@ const CANALES = [
     { n: "Short Mix 90s", m: P1 + "short-mix-90s/" },
     { n: "Sesion los 90 estilos", t: "Sesion los 90 total estilos", m: P1 + "sesion-los-90-total-estilos/" },
     { n: "Sesion 90s remixes", m: P1 + "sesion-90s-remixes/" },
-    { n: "Sesion 90s 2019", m: P1 + "sesion-90s-2019/" }
-    { n: "Luis Peláez Mix 2 (1995)" m: P1 + "luis-pelaez-mix-2-1995/" },
-    { n: "Luis Peláez Mix 3 (1996)", m: P2 + "luis-pel%C3%A1ez-mix-3-1996/" },
-    { n: "Luis Peláez Mix 4 (1996)", m: P3 + "luis-pelaez-mix-4-1996/" }
+    { n: "Sesion 90s 2019", m: P1 + "sesion-90s-2019/" },
+    { n: "Mix 2 1995", t: "Luis Pelaez mix 2 1995", m: P1 + "luis-pelaez-mix-2-1995/" },
+    { n: "Mix 3 1996", t: "Luis Peláez mix 3 1996", m: P2 + "luis-pel%C3%A1ez-mix-3-1996/" },
+    { n: "Mix 4 1996", t: "Luis Pelaez mix 4 1996", m: P3 + "luis-pelaez-mix-4-1996/" }
   ]},
   { titulo: "Sesiones\nLos 2000s", color: "--c-2000s", knobs: [30, -10], fader: -50, pistas: [
     { n: "Short Mix 10s", m: P1 + "short-mix-10s/" },
@@ -327,8 +329,10 @@ function abrirVideo(btn) {
     title: 'Vídeo: ' + btn.dataset.track,
     src: url.toString(),
     allow: 'autoplay; encrypted-media; picture-in-picture; fullscreen',
+    referrerPolicy: 'strict-origin-when-cross-origin', /* YouTube exige referrer: sin él da el error 153 */
     allowFullscreen: true
   }));
+  $('yt-enlace').href = 'https://www.youtube.com/watch?v=' + btn.dataset.yt;
   modal.classList.add('open');
   ultimoBoton = btn;
   marcarActivo(btn);
